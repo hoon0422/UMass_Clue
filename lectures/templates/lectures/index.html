@@ -1,0 +1,44 @@
+{% extends "lectures/layout.html" %}
+{% block content %}
+    <table>
+        <thead>
+        <tr>
+            <td>Title</td>
+            <td>Professor</td>
+            <td>Building</td>
+            <td>Time</td>
+            <td>Semester</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for lecture in lectures %}
+            <tr>
+                <td>{{ lecture.title }}</td>
+                <td>
+                    {% for professor in lecture.professors.all %}
+                        {{ professor.name }},&nbsp;
+                    {% endfor %}
+                </td>
+                <td>{{ lecture.building.name }}</td>
+                <td>
+                    {% for day_time in lecture.days.all %}
+                        <p class="nobr">
+                            {{ day_time.day }}&nbsp;
+                            {{ day_time.start_time.hour }}:{{ day_time.start_time.min }}
+                            ~{{ day_time.end_time.hour }}:{{ day_time.end_time.min }}
+                        </p>
+                    {% endfor %}
+                </td>
+                <td>
+                    {{ lecture.year_and_semester.year }}&nbsp;
+                    {% if lecture.year_and_semester.semester == 0 %}Spring
+                    {% elif lecture.year_and_semester.semester == 1 %}Summer
+                    {% elif lecture.year_and_semester.semester == 2 %}Fall
+                    {% else %}Winter
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

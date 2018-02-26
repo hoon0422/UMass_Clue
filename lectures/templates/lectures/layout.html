@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        .nobr { white-space: nowrap; }
+    </style>
+    <title>UMass Clue</title>
+</head>
+<body>
+<div class="topnav">
+    <form action="#" href="#">
+        <input type="text" placeholder="Search...">
+        <select name="search_option" id="search_option">
+            <option value="Lecture">Lecture</option>
+            <option value="Professor">Professor</option>
+            <option value="Building">Building</option>
+        </select>
+    </form>
+</div>
+{% block content %}
+{% endblock %}
+</body>
+</html>
