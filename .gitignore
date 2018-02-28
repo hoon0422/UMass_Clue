@@ -1,2 +1,4 @@
 .idea/
 htmls/
+__pycache__
+*.pyc
