@@ -1,4 +1,6 @@
 .idea/
 htmls/
-__pycache__
+__pycache__/
 *.pyc
+lectures/migrations/
+web_crawler/*.txt
