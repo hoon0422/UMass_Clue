@@ -121,10 +121,16 @@ class ClassCrawler:
 
         self.driver.find_element_by_name('CLASS_SRCH_WRK2_SSR_OPEN_ONLY').click()
 
-        self.driver.find_element_by_name('CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH').click()
+        start_time = time.time()
+        while self.current_page.get_current_page() == self.current_page.ENTRY:
+            try:
+                self.driver.find_element_by_name('CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH').click()
+                self.__wait_for_going_to_search()
+                self.current_page.go_to_search()
+            except TimeoutException as ex:
+                if time.time() - start_time > 60:
+                    raise ex
 
-        self.__wait_for_going_to_search()
-        self.current_page.go_to_search()
         return True
 
     def progress_to_detail(self, section_idx: int):
@@ -136,9 +142,17 @@ class ClassCrawler:
             detail_element = self.driver.find_element_by_name('DERIVED_CLSRCH_SSR_CLASSNAME_LONG$' + str(section_idx))
         except NoSuchElementException:
             return False
-        detail_element.click()
-        self.__wait_for_going_to_detail()
-        self.current_page.go_to_detail()
+
+        start_time = time.time()
+        while self.current_page.get_current_page() == self.current_page.SEARCH:
+            try:
+                detail_element.click()
+                self.__wait_for_going_to_detail()
+                self.current_page.go_to_detail()
+            except TimeoutException as ex:
+                if time.time() - start_time > 60:
+                    raise ex
+
         return True
 
     def return_to_search(self):
@@ -148,9 +162,16 @@ class ClassCrawler:
             return
 
         view_search_result_btn = self.driver.find_element_by_name('CLASS_SRCH_WRK2_SSR_PB_BACK')
-        view_search_result_btn.click()
-        self.__wait_for_going_to_search()
-        self.current_page.go_to_search()
+
+        start_time = time.time()
+        while self.current_page.get_current_page() == self.current_page.DETAIL:
+            try:
+                view_search_result_btn.click()
+                self.__wait_for_going_to_search()
+                self.current_page.go_to_search()
+            except TimeoutException as ex:
+                if time.time() - start_time > 60:
+                    raise ex
 
     def return_to_entry(self):
         if self.current_page.get_current_page() is not self.current_page.SEARCH:
@@ -159,9 +180,16 @@ class ClassCrawler:
             return
 
         start_new_search_btn = self.driver.find_element_by_name('CLASS_SRCH_WRK2_SSR_PB_NEW_SEARCH')
-        start_new_search_btn.click()
-        self.__wait_for_going_to_entry()
-        self.current_page.go_to_entry()
+
+        start_time = time.time()
+        while self.current_page.get_current_page() == self.current_page.SEARCH:
+            try:
+                start_new_search_btn.click()
+                self.__wait_for_going_to_entry()
+                self.current_page.go_to_entry()
+            except TimeoutException as ex:
+                if time.time() - start_time > 60:
+                    raise ex
 
     def __update_major_keymap(self):
         self.major_keymap = {}
