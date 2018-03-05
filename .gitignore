@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 lectures/migrations/
 web_crawler/*.txt
+raw/

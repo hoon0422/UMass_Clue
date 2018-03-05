@@ -52,6 +52,6 @@ def save_query(info: dict):
         session.components.add(component)
 
 
-infos = get_data("C:\\Users\\Administrator\\Desktop\\Younghoon_Jeong\\djangoPrac\\UMass_Clue\\UMass_Clue\\web_crawler\\0-90_classes.txt")
+infos = get_data("C:\\Users\\Administrator\\Desktop\\Younghoon_Jeong\\djangoPrac\\UMass_Clue\\UMass_Clue\\raw\\classes.txt")
 for info in infos:
     save_query(info)

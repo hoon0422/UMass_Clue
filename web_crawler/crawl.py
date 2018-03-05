@@ -406,6 +406,9 @@ def crawl_data(
             to_major_idx = major_num
         print(from_major_idx, "~", to_major_idx, " start")
 
+        class_file_name = "../raw/" + '/'.join(class_file_name.split('\\'))
+        log_file_name = "../raw/" + '/'.join(log_file_name.split('\\'))
+
         info = Info()
         with open(class_file_name, mode='a', encoding='utf8')as class_file, open(log_file_name, mode='a') as log_file:
             try:
