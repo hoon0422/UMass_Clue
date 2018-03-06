@@ -60,19 +60,6 @@ class ClassCrawler:
             for c in self.current.keys():
                 self.current[c] = False
 
-    class _wait_for_the_attribute_value(object):
-        def __init__(self, locator, attribute, value):
-            self.locator = locator
-            self.attribute = attribute
-            self.value = value
-
-        def __call__(self, driver):
-            try:
-                element_attribute = EC._find_element(driver, self.locator).get_attribute(self.attribute)
-                return element_attribute == self.value
-            except StaleElementReferenceException:
-                return False
-
     def __init__(self, options=None):
         self.options = options
         self.driver = webdriver.Chrome('./chromedriver.exe', chrome_options=options)
@@ -89,10 +76,14 @@ class ClassCrawler:
         self.driver.get(ClassCrawler.class_url)
 
         self.__wait_for_going_to_entry()
-        self.current_page.go_to_entry()
+        if self.driver.find_element_by_id('pt_pageinfo_win0').get_attribute('page') == 'SSR_CLSRCH_ENTRY':
+            self.current_page.go_to_entry()
+        else:
+            return False
 
         self.__update_major_keymap()
         self.login_state = True
+        return True
 
     def progress_to_search(self, year: int, semester: str, career_str: str, major_idx: int):
         if self.current_page.get_current_page() is not self.current_page.ENTRY:
@@ -100,36 +91,29 @@ class ClassCrawler:
                 raise Exception()
             return False
 
-        try:
-            self.driver.execute_script("document.getElementById('UM_DERIVED_SA_UM_TERM_DESCR')"
-                                       ".setAttribute('onchange', '')")
-            term_select = Select(self.driver.find_element_by_name('UM_DERIVED_SA_UM_TERM_DESCR'))
-            term_select.select_by_visible_text(str(year) + ' ' + semester)
+        self.driver.execute_script("document.getElementById('UM_DERIVED_SA_UM_TERM_DESCR')"
+                                   ".setAttribute('onchange', '')")
+        term_select = Select(self.driver.find_element_by_name('UM_DERIVED_SA_UM_TERM_DESCR'))
+        term_select.select_by_visible_text(str(year) + ' ' + semester)
 
-            self.driver.execute_script("document.getElementById('CLASS_SRCH_WRK2_SUBJECT$108$')"
-                                       ".setAttribute('onchange', '')")
-            course_select = Select(self.driver.find_element_by_name('CLASS_SRCH_WRK2_SUBJECT$108$'))
-            course_select.select_by_index(major_idx)
+        self.driver.execute_script("document.getElementById('CLASS_SRCH_WRK2_SUBJECT$108$')"
+                                   ".setAttribute('onchange', '')")
+        course_select = Select(self.driver.find_element_by_name('CLASS_SRCH_WRK2_SUBJECT$108$'))
+        course_select.select_by_index(major_idx)
 
-            self.driver.execute_script("document.getElementById('CLASS_SRCH_WRK2_ACAD_CAREER')"
-                                       ".setAttribute('onchange', '')")
-            career_select = Select(self.driver.find_element_by_name('CLASS_SRCH_WRK2_ACAD_CAREER'))
-            career_select.select_by_visible_text(career_str)
-
-        except NoSuchAttributeException:
-            return False
+        self.driver.execute_script("document.getElementById('CLASS_SRCH_WRK2_ACAD_CAREER')"
+                                   ".setAttribute('onchange', '')")
+        career_select = Select(self.driver.find_element_by_name('CLASS_SRCH_WRK2_ACAD_CAREER'))
+        career_select.select_by_visible_text(career_str)
 
         self.driver.find_element_by_name('CLASS_SRCH_WRK2_SSR_OPEN_ONLY').click()
 
-        start_time = time.time()
-        while self.current_page.get_current_page() == self.current_page.ENTRY:
-            try:
-                self.driver.find_element_by_name('CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH').click()
-                self.__wait_for_going_to_search()
-                self.current_page.go_to_search()
-            except TimeoutException as ex:
-                if time.time() - start_time > 60:
-                    raise ex
+        self.driver.find_element_by_name('CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH').click()
+        self.__wait_for_going_to_search()
+        if self.driver.find_element_by_id('pt_pageinfo_win0').get_attribute('page') == 'SSR_CLSRCH_RSLT':
+            self.current_page.go_to_search()
+        else:
+            return False
 
         return True
 
@@ -138,20 +122,18 @@ class ClassCrawler:
             if DEBUG:
                 raise Exception()
             return False
+
         try:
             detail_element = self.driver.find_element_by_name('DERIVED_CLSRCH_SSR_CLASSNAME_LONG$' + str(section_idx))
         except NoSuchElementException:
             return False
 
-        start_time = time.time()
-        while self.current_page.get_current_page() == self.current_page.SEARCH:
-            try:
-                detail_element.click()
-                self.__wait_for_going_to_detail()
-                self.current_page.go_to_detail()
-            except TimeoutException as ex:
-                if time.time() - start_time > 60:
-                    raise ex
+        detail_element.click()
+        self.__wait_for_going_to_detail()
+        if self.driver.find_element_by_id('pt_pageinfo_win0').get_attribute('page') == 'SSR_CLSRCH_DTL':
+            self.current_page.go_to_detail()
+        else:
+            return False
 
         return True
 
@@ -163,15 +145,13 @@ class ClassCrawler:
 
         view_search_result_btn = self.driver.find_element_by_name('CLASS_SRCH_WRK2_SSR_PB_BACK')
 
-        start_time = time.time()
-        while self.current_page.get_current_page() == self.current_page.DETAIL:
-            try:
-                view_search_result_btn.click()
-                self.__wait_for_going_to_search()
-                self.current_page.go_to_search()
-            except TimeoutException as ex:
-                if time.time() - start_time > 60:
-                    raise ex
+        view_search_result_btn.click()
+        self.__wait_for_going_to_search()
+        if self.driver.find_element_by_id('pt_pageinfo_win0').get_attribute('page') == 'SSR_CLSRCH_RSLT':
+            self.current_page.go_to_search()
+        else:
+            return False
+        return True
 
     def return_to_entry(self):
         if self.current_page.get_current_page() is not self.current_page.SEARCH:
@@ -181,15 +161,23 @@ class ClassCrawler:
 
         start_new_search_btn = self.driver.find_element_by_name('CLASS_SRCH_WRK2_SSR_PB_NEW_SEARCH')
 
-        start_time = time.time()
-        while self.current_page.get_current_page() == self.current_page.SEARCH:
-            try:
-                start_new_search_btn.click()
-                self.__wait_for_going_to_entry()
-                self.current_page.go_to_entry()
-            except TimeoutException as ex:
-                if time.time() - start_time > 60:
-                    raise ex
+        start_new_search_btn.click()
+        self.__wait_for_going_to_entry()
+
+        if self.driver.find_element_by_id('pt_pageinfo_win0').get_attribute('page') == 'SSR_CLSRCH_ENTRY':
+            self.current_page.go_to_entry()
+        else:
+            return False
+        return True
+
+    def clear_criteria(self):
+        if self.current_page.get_current_page() is not self.current_page.ENTRY:
+            if DEBUG:
+                raise Exception()
+            return False
+
+        self.driver.find_element_by_name('CLASS_SRCH_WRK2_SSR_PB_CLEAR').click()
+        self.__wait_for_error_message_disappear()
 
     def __update_major_keymap(self):
         self.major_keymap = {}
@@ -198,20 +186,36 @@ class ClassCrawler:
         for option in options:
             self.major_keymap[option.get_attribute('value')] = option.text
 
+    def __wait_for_error_message_disappear(self):
+        WebDriverWait(self.driver, 60).until_not(
+            EC.presence_of_element_located((By.ID, 'DERIVED_CLSMSG_ERROR_TEXT'))
+        )
+
     def __wait_for_going_to_entry(self):
         WebDriverWait(self.driver, 60).until(
-            ClassCrawler._wait_for_the_attribute_value((By.ID, 'pt_pageinfo_win0'), 'page', 'SSR_CLSRCH_ENTRY')
+            lambda driver: self.__wait_for_attribute_value(driver, (By.ID, 'pt_pageinfo_win0'),
+                                                           'page', 'SSR_CLSRCH_ENTRY')
         )
 
     def __wait_for_going_to_search(self):
         WebDriverWait(self.driver, 60).until(
-            ClassCrawler._wait_for_the_attribute_value((By.ID, 'pt_pageinfo_win0'), 'page', 'SSR_CLSRCH_RSLT')
+            lambda driver:
+            self.__wait_for_attribute_value(driver, (By.ID, 'pt_pageinfo_win0'), 'page', 'SSR_CLSRCH_RSLT') or
+            driver.find_element_by_id('DERIVED_CLSMSG_ERROR_TEXT')
         )
 
     def __wait_for_going_to_detail(self):
         WebDriverWait(self.driver, 60).until(
-            ClassCrawler._wait_for_the_attribute_value((By.ID, 'pt_pageinfo_win0'), 'page', 'SSR_CLSRCH_DTL')
+            lambda driver: self.__wait_for_attribute_value(driver, (By.ID, 'pt_pageinfo_win0'),
+                                                           'page', 'SSR_CLSRCH_DTL')
         )
+
+    def __wait_for_attribute_value(self, driver, locator, attribute, value):
+        try:
+            element_attribute = EC._find_element(driver, locator).get_attribute(attribute)
+            return element_attribute == value
+        except StaleElementReferenceException:
+            return False
 
     def __enter__(self):
         return self
@@ -442,7 +446,9 @@ def crawl_data(
             try:
                 for career in career_list:
                     for major_idx in range(from_major_idx, to_major_idx):
-                        if crawler.progress_to_search(2018, 'Spring', career, major_idx + 1) is False:
+                        a = crawler.progress_to_search(2018, 'Spring', career, major_idx + 1)
+                        if a is False:
+                            crawler.clear_criteria()
                             continue
                         section_idx = 0
 
@@ -450,6 +456,11 @@ def crawl_data(
                             info.crawl(crawler.driver.page_source, crawler.major_keymap)
                             class_file.write(json.dumps(info.get_info_dict(), ensure_ascii=False) + "\n")
                             log_file.write(
+                                str(time.time()) + " - Career: " + career
+                                + " / Major: " + info.major
+                                + " / Class#: " + info.class_num + "\n"
+                            )
+                            print(
                                 str(time.time()) + " - Career: " + career
                                 + " / Major: " + info.major
                                 + " / Class#: " + info.class_num + "\n"
