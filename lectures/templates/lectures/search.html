@@ -1,4 +1,26 @@
 {% extends "lectures/layout.html" %}
 {% block content %}
-
+    <table>
+        <thead>
+        <tr>
+            <td>Major</td>
+            <td>Career</td>
+            <td>Title</td>
+            <td>Semester</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for course in courses %}
+            <tr>
+                <td>{{ course.major.title }}</td>
+                <td>{{ course.career.title }}</td>
+                <td>{{ course.title }}</td>
+                <td>
+                    {{ course.year_and_semester.year }}&nbsp;
+                    {{ course.year_and_semester.semester }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

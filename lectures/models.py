@@ -31,7 +31,7 @@ class Professor(models.Model):
     name = models.CharField(max_length=50, null=False, primary_key=True)
 
 
-class Building(models.Model):
+class Room(models.Model):
     name = models.CharField(max_length=50, null=False)
 
 
@@ -44,7 +44,7 @@ class DayTimeField(models.Model):
 class Session(models.Model):
     class_num = models.CharField(max_length=5, null=False, primary_key=True)
     professors = models.ManyToManyField(Professor)
-    room = models.ForeignKey(Building, on_delete=models.DO_NOTHING, null=False)
+    room = models.ForeignKey(Room, on_delete=models.DO_NOTHING, null=False)
     times = models.ManyToManyField(DayTimeField)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=False)
     components = models.ManyToManyField(Category)

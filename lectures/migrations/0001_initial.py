@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=50)),
                 ('start_time', models.TimeField()),
                 ('end_time', models.TimeField()),
-                ('building', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='lectures.Building')),
+                ('building', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='lectures.Room')),
                 ('days', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lectures.DayField')),
             ],
         ),

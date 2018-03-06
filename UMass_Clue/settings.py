@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': 'django_UMass_Clue',
         'USER': 'root',
         'PASSWORD': '0000',
-        'HOST': '192.168.25.41',
+        'HOST': '192.168.25.31',
         'PORT': '3306'
     }
 }

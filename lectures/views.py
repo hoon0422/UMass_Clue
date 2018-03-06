@@ -1,35 +1,39 @@
 from django.shortcuts import render
 from .models import *
+from lectures.forms import *
 
 
 def index(request):
-    lectures = Lecture.objects.all()
-    context = {'lectures': lectures}
+    form = SearchForm(request.POST, request.FILES)
+    context = {"form": form}
     return render(request, "lectures/index.html", context)
 
 
-def search_lecture(request, lecture_key):
-    lectures = Lecture.objects.filter(title__contains=lecture_key)
-    context = {'lectures': lectures}
-    return render(request, "lectures/index.html", context)
+def search(request):
+    courses = []
+    data = request.POST
+    form = SearchForm(request.POST, request.FILES)
+
+    if data["search_option"] == "Course":
+        courses = search_course(data["search_key"])
+    elif data["search_option"] == "Professor":
+        courses = search_professor(data["search_key"])
+    elif data["search_option"] == "Room":
+        courses = search_room(data["search_key"])
+
+    context = {"courses": courses, "form": form}
+    return render(request, "lectures/search.html", context)
 
 
-def search_professor(request, professor_key):
-    professors = Professor.objects.filter(name__contains=professor_key)
-    lectures = []
-    for professor in professors:
-        lectures = lectures + professor.lecture_set
-    context = {'lectures': lectures}
-    return render(request, "lectures/index.html", context)
+def search_course(course_key):
+    return Course.objects.filter(title__contains=course_key)
 
 
-def search_building(request, building_key):
-    buildings = Building.objects.filter(name__contains=building_key)
-    lectures = []
-    for building in buildings:
-        lectures = lectures + building.lecture_set
-    context = {'lectures': lectures}
-    return render(request, "lectures/index.html", context)
+def search_professor(professor_key):
+    return Course.objects.filter(session__professors__name__contains=professor_key)
 
+
+def search_room(building_key):
+    return Course.objects.filter(session__room__name__contains=building_key)
 
 # Create your views here.

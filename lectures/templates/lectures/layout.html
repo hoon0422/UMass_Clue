@@ -11,14 +11,11 @@
     <title>UMass Clue</title>
 </head>
 <body>
-<div class="topnav">
-    <form action="#" href="#">
-        <input type="text" placeholder="Search...">
-        <select name="search_option" id="search_option">
-            <option value="Lecture">Lecture</option>
-            <option value="Professor">Professor</option>
-            <option value="Building">Building</option>
-        </select>
+<div class="top nav">
+    <form action="{% url "lectures:search_course" %}" accept-charset="utf-8" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Search">
     </form>
 </div>
 {% block content %}

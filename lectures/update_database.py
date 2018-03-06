@@ -31,7 +31,7 @@ def save_query(info: dict):
                                              category=category, course_num=info["course_num"],
                                              year_and_semester=year_and_semester)
 
-    room, _ = Building.objects.get_or_create(name=info["room"])
+    room, _ = Room.objects.get_or_create(name=info["room"])
 
     session, _ = Session.objects.get_or_create(class_num=info["class_num"], room=room, course=course,
                                                upper_unit=info["upper_unit"], lower_unit=info["lower_unit"])
