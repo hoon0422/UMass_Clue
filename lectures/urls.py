@@ -1,9 +1,9 @@
-from django.conf.urls import url
+from django.urls import path
 from . import views
 
 app_name = 'lectures'
 
 urlpatterns = [
-    url(r'^$', views.index, name='home'),
-    url(r'^search/', views.search, name='search_course'),
+    path('', views.IndexView.as_view(), name='home'),
+    path('search/', views.SearchView.as_view(), name='search_course'),
 ]

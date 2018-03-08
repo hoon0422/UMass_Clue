@@ -12,9 +12,8 @@
 </head>
 <body>
 <div class="top nav">
-    <form action="{% url "lectures:search_course" %}" accept-charset="utf-8" method="post">
-        {% csrf_token %}
-        {{ form }}
+    <form action="{% url "lectures:search_course" %}" accept-charset="utf-8" method="get">
+        {{ search_form }}
         <input type="submit" value="Search">
     </form>
 </div>
