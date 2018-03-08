@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+import numpy as np
 
 
 def get_times(log_file: str):
@@ -34,4 +35,11 @@ def draw_time_diff_graph(log_file):
 
 
 if __name__ == "__main__":
-    draw_time_diff_graph("../raw/log.txt")
+    time_diff = get_time_diff(get_times("../raw/log.txt"))
+    print("Average:", np.mean(time_diff))
+    print("STD:", np.std(time_diff))
+
+    plt.ylabel('Time difference (sec)')
+    plt.xlabel('Number of data')
+    plt.plot(time_diff)
+    plt.show()

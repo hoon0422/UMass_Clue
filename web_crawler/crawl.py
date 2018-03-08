@@ -359,7 +359,7 @@ class Info:
 
         lower_unit = unit_str[0:unit_str.find(' ')]
         upper_unit = unit_str[unit_str.rfind(' ') + 1:]
-        return int(lower_unit), int(upper_unit)
+        return round(float(lower_unit), 1), round(float(upper_unit), 1)
 
     @staticmethod
     def __preprocess_components(component_eles):
@@ -425,7 +425,7 @@ class Info:
 def crawl_data(
         class_file_name: str = 'classes.txt',
         log_file_name: str = 'log.txt',
-        from_major_idx: int = 0,
+        from_major_idx: int = 56,
         to_major_idx: int = 200,
         options=None
 ):
@@ -447,6 +447,9 @@ def crawl_data(
                 for career in career_list:
                     for major_idx in range(from_major_idx, to_major_idx):
                         a = crawler.progress_to_search(2018, 'Spring', career, major_idx + 1)
+                        log_file.write("Major idx: %d\n" % (major_idx + 1))
+                        print("Major idx: %d" % (major_idx + 1))
+
                         if a is False:
                             crawler.clear_criteria()
                             continue
@@ -463,7 +466,7 @@ def crawl_data(
                             print(
                                 str(time.time()) + " - Career: " + career
                                 + " / Major: " + info.major
-                                + " / Class#: " + info.class_num + "\n"
+                                + " / Class#: " + info.class_num
                             )
                             crawler.return_to_search()
                             section_idx += 1

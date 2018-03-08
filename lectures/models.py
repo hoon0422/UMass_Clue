@@ -48,5 +48,5 @@ class Session(models.Model):
     times = models.ManyToManyField(DayTimeField)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=False)
     components = models.ManyToManyField(Category)
-    upper_unit = models.SmallIntegerField(null=False)
-    lower_unit = models.SmallIntegerField(null=False)
+    upper_unit = models.FloatField(null=False)
+    lower_unit = models.FloatField(null=False)
