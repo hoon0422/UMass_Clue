@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views import generic
 from .models import *
 from lectures.forms import *
+from django.utils.datastructures import MultiValueDictKeyError
 
 
 class IndexView(generic.TemplateView):
@@ -9,13 +10,14 @@ class IndexView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(kwargs=kwargs)
-        context["search_form"] = SearchForm(self.request.POST, self.request.FILES)
+        context["search_form"] = SearchForm(self.request.GET, self.request.FILES)
         return context
 
 
 class SearchView(generic.ListView):
     template_name = "lectures/search.html"
     context_object_name = "courses"
+    paginate_by = 10
 
     def get_queryset(self):
         option = self.get_search_option()
@@ -27,11 +29,14 @@ class SearchView(generic.ListView):
             courses = SearchView.search_room(self.get_search_key())
         else:
             courses = []
+
         return courses
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(kwargs=kwargs)
-        context["search_form"] = SearchForm(self.request.POST, self.request.FILES)
+        context["search_form"] = SearchForm(self.request.GET, self.request.FILES)
+        context["search_key"] = self.get_search_key()
+        context["search_option"] = self.get_search_option()
         return context
 
     def get_search_option(self):
