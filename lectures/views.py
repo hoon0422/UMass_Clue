@@ -13,12 +13,11 @@ class IndexView(generic.TemplateView):
         return context
 
 
-class SearchView(IndexView):
+class SearchView(generic.ListView):
     template_name = "lectures/search.html"
+    context_object_name = "courses"
 
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(kwargs=kwargs)
+    def get_queryset(self):
         option = self.get_search_option()
         if option == "Course":
             courses = SearchView.search_course(self.get_search_key())
@@ -28,7 +27,11 @@ class SearchView(IndexView):
             courses = SearchView.search_room(self.get_search_key())
         else:
             courses = []
-        context["courses"] = courses
+        return courses
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(kwargs=kwargs)
+        context["search_form"] = SearchForm(self.request.POST, self.request.FILES)
         return context
 
     def get_search_option(self):
