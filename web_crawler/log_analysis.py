@@ -26,6 +26,10 @@ def get_time_diff(times: list):
     return diff
 
 
+def get_total_time(times: list):
+    return times[len(times) - 1] - times[0]
+
+
 def draw_time_diff_graph(log_file):
     time_diff = get_time_diff(get_times(log_file))
     plt.ylabel('Time difference (sec)')
@@ -35,7 +39,9 @@ def draw_time_diff_graph(log_file):
 
 
 if __name__ == "__main__":
-    time_diff = get_time_diff(get_times("../raw/log.txt"))
+    times = get_times("../raw/log.txt")
+    time_diff = get_time_diff(times)
+    print("Total time:", "%d min %f sec" % (int(get_total_time(times) / 60), get_total_time(times) % 60))
     print("Average:", np.mean(time_diff))
     print("STD:", np.std(time_diff))
 
