@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': 'django_UMass_Clue',
         'USER': 'root',
         'PASSWORD': '0000',
-        'HOST': '192.168.25.31',
+        'HOST': 'localhost',
         'PORT': '3306'
     }
 }
@@ -128,6 +128,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 
 
 AUTH_USER_MODEL = 'accounts.User'

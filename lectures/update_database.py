@@ -11,7 +11,7 @@ import datetime
 
 def get_data(file_name: str):
     infos = []
-    with open(file_name, 'r', encoding='utf8') as file:
+    with open(file_name, 'r', encoding='utf-8-sig') as file:
         data_str_list = file.read().strip().split('\n')
         for data_str in data_str_list:
             infos.append(json.loads(data_str))
