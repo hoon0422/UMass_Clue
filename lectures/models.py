@@ -41,7 +41,7 @@ class DayTimeField(models.Model):
     end_time = models.TimeField(null=False)
 
 
-class Session(models.Model):
+class Section(models.Model):
     class_num = models.CharField(max_length=5, null=False, primary_key=True)
     professors = models.ManyToManyField(Professor)
     room = models.ForeignKey(Room, on_delete=models.DO_NOTHING, null=False)

@@ -33,23 +33,23 @@ def save_query(info: dict):
 
     room, _ = Room.objects.get_or_create(name=info["room"])
 
-    session, _ = Session.objects.get_or_create(class_num=info["class_num"], room=room, course=course,
+    section, _ = Section.objects.get_or_create(class_num=info["class_num"], room=room, course=course,
                                                upper_unit=info["upper_unit"], lower_unit=info["lower_unit"])
 
     for info_professor in info["professors"]:
         professor, _ = Professor.objects.get_or_create(name=info_professor)
-        session.professors.add(professor)
+        section.professors.add(professor)
 
     for info_time in info["times"]:
         start_time = datetime.time(info_time["start_hour"], info_time["start_min"], 0, 0)
         end_time = datetime.time(info_time["end_hour"], info_time["end_min"], 0, 0)
         time, _ = DayTimeField.objects.get_or_create(day=info_time["day"], start_time=start_time,
                                                      end_time=end_time)
-        session.times.add(time)
+        section.times.add(time)
 
     for info_component in info["components"]:
         component, _ = Category.objects.get_or_create(title=info_component)
-        session.components.add(component)
+        section.components.add(component)
 
 
 infos = get_data("C:\\Users\\Administrator\\Desktop\\Younghoon_Jeong\\djangoPrac\\UMass_Clue\\UMass_Clue\\raw\\classes.txt")
