@@ -42,7 +42,7 @@ class DayTimeField(models.Model):
 
 
 class Section(models.Model):
-    class_num = models.CharField(max_length=5, null=False, primary_key=True)
+    class_num = models.CharField(max_length=5, null=False)
     professors = models.ManyToManyField(Professor)
     room = models.ForeignKey(Room, on_delete=models.DO_NOTHING, null=False)
     times = models.ManyToManyField(DayTimeField)

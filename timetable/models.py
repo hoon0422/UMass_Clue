@@ -1,10 +1,10 @@
 from django.db import models
-from lectures.models import Session
+from lectures.models import Section
 
 
 class Timetable(models.Model):
     title = models.CharField(max_length=20, null=False)
-    sessions = models.ManyToManyField(Session)
+    sessions = models.ManyToManyField(Section)
 
     def __str__(self):
         return self.title

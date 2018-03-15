@@ -1,8 +1,6 @@
-from django.shortcuts import render
 from django.views import generic
 from .models import *
 from lectures.forms import *
-from django.utils.datastructures import MultiValueDictKeyError
 
 
 class IndexView(generic.TemplateView):
@@ -16,7 +14,7 @@ class IndexView(generic.TemplateView):
 
 class SearchView(generic.ListView):
     template_name = "lectures/search.html"
-    context_object_name = "courses"
+    context_object_name = "sections"
     paginate_by = 10
 
     def get_queryset(self):
@@ -47,12 +45,17 @@ class SearchView(generic.ListView):
 
     @staticmethod
     def search_course(course_key):
-        return Course.objects.filter(title__contains=course_key)
+        return Section.objects.filter(course__title__contains=course_key)
 
     @staticmethod
     def search_professor(professor_key):
-        return Course.objects.filter(session__professors__name__contains=professor_key)
+        return Section.objects.filter(professors__name__contains=professor_key)
 
     @staticmethod
-    def search_room(building_key):
-        return Course.objects.filter(session__room__name__contains=building_key)
+    def search_room(room_key):
+        return Section.objects.filter(room__name__contains=room_key)
+
+
+class DetailView(generic.DetailView):
+    template_name = "lectures/detail.html"
+    model = Section

@@ -13,18 +13,27 @@
             <th>Major</th>
             <th>Career</th>
             <th>Title</th>
+            <th>Professor</th>
             <th>Semester</th>
         </tr>
         </thead>
         <tbody>
-        {% for course in courses %}
-            <tr>
-                <td>{{ course.major.title }}</td>
-                <td>{{ course.career.title }}</td>
-                <td>{{ course.title }}</td>
+        {% for section in sections %}
+            <tr onclick="window.location='{% url "lectures:detail" section.pk %}'">
+                <td>{{ section.course.major.title }}</td>
+                <td>{{ section.course.career.title }}</td>
+                <td>{{ section.course.title }}</td>
                 <td>
-                    {{ course.year_and_semester.year }}&nbsp;
-                    {{ course.year_and_semester.semester }}
+                    {% for professor in section.professors.all %}
+                        {{ professor.name }}
+                        {% if not forloop.last %}
+                            ,
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    {{ section.course.year_and_semester.year }}&nbsp;
+                    {{ section.course.year_and_semester.semester }}
                 </td>
             </tr>
         {% endfor %}

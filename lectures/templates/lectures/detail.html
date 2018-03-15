@@ -1,0 +1,33 @@
+{% extends "lectures/layout.html" %}
+{% block content %}
+    <h1>Course: {{ section.course.title }}</h1>
+    <p>Class #: {{ section.class_num }}</p>
+    <p>
+        Professor:
+        {% for professor in section.professors.all %}
+            {{ professor.name }}
+            {% if not forloop.last %}
+                ,
+            {% endif %}
+        {% endfor %}
+    </p>
+    <p>Room: {{ section.room.name }}</p>
+    <p>Type: {{ section.course.category.title }}</p>
+    <p>
+        Components:
+        {% for component in section.components.all %}
+            {{ component.title }}
+            {% if not forloop.last %}
+                ,
+            {% endif %}
+        {% endfor %}
+    </p>
+    <p>
+        Unit:
+        {% if section.upper_unit == section.lower_unit %}
+            {{ section.upper_unit }}
+        {% else %}
+            {{ section.lower_unit }} ~ {{ section.upper_unit }}
+        {% endif %}
+    </p>
+{% endblock %}
