@@ -11,11 +11,11 @@ class LogoutView(authviews.LogoutView):
 
 
 class PasswordChangeView(authviews.PasswordChangeView):
-    template_name = 'accounts/login.html'
+    template_name = 'accounts/password_reset_confirm.html'
 
 
 class PasswordChangeDoneView(authviews.PasswordChangeDoneView):
-    template_name = 'accounts/login.html'
+    template_name = 'accounts/password_reset_complete.html'
 
 
 class PasswordResetView(authviews.PasswordResetView):

@@ -6,19 +6,19 @@ class SearchForm(forms.Form):
         label="",
         max_length=30,
         widget=forms.TextInput(attrs={
-            'class': 'search-input'
+            'placeholder': 'Search'
         }),
         required=False)
-
-    search_option = forms.ChoiceField(
-        label="",
-        required=False,
-        choices=(
-            ("Course", "Course"),
-            ("Professor", "Professor"),
-            ("Room", "Room")
-        ),
-        widget=forms.Select(attrs={
-            'class': 'search-option'
-        })
-    )
+    #
+    # search_option = forms.ChoiceField(
+    #     label="",
+    #     required=False,
+    #     choices=(
+    #         ("Course", "Course"),
+    #         ("Professor", "Professor"),
+    #         ("Room", "Room")
+    #     ),
+    #     widget=forms.Select(attrs={
+    #         'class': 'ui fluid search selection dropdown'
+    #     })
+    # )

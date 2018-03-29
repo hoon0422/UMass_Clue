@@ -18,12 +18,13 @@ class SearchView(generic.ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        option = self.get_search_option()
-        if option == "Course":
+        option = self.get_search_option().lower()
+        print(option)
+        if option == "course":
             courses = SearchView.search_course(self.get_search_key())
-        elif option == "Professor":
+        elif option == "professor":
             courses = SearchView.search_professor(self.get_search_key())
-        elif option == "Room":
+        elif option == "room":
             courses = SearchView.search_room(self.get_search_key())
         else:
             courses = []
@@ -34,14 +35,24 @@ class SearchView(generic.ListView):
         context = super().get_context_data(kwargs=kwargs)
         context["search_form"] = SearchForm(self.request.GET, self.request.FILES)
         context["search_key"] = self.get_search_key()
-        context["search_option"] = self.get_search_option()
         return context
 
     def get_search_option(self):
-        return self.request.GET["search_option"]
+        key = self.get_search_key()
+        idx = key.rfind('#')
+
+        if idx == -1:
+            return "Course"
+
+        return key[idx + 1:].strip()
 
     def get_search_key(self):
-        return self.request.GET["search_key"]
+        key = self.request.GET["search_key"]
+        idx = key.rfind('#')
+        if idx >= 0:
+            key = key[:idx]
+
+        return key
 
     @staticmethod
     def search_course(course_key):
@@ -59,3 +70,9 @@ class SearchView(generic.ListView):
 class DetailView(generic.DetailView):
     template_name = "lectures/detail.html"
     model = Section
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(kwargs=kwargs)
+        context["search_form"] = SearchForm(self.request.GET, self.request.FILES)
+        context["search_key"] = ""
+        return context

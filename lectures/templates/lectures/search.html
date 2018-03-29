@@ -1,9 +1,8 @@
-{% extends "lectures/layout.html" %}
+{% extends "base/layout.html" %}
 {% load static %}
 {% load lecture_extras %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'lectures/search.css' %}" type="text/css">
 {% endblock %}
 
 {% block content %}
@@ -41,7 +40,7 @@
         {% if is_paginated %}
             <tfoot>
             <tr>
-                <th colspan="4">
+                <th colspan="5">
                     <div class="ui right floated pagination menu">
                         {% if page_obj.has_previous %}
                             <a class="item" href="{% url_replace page=page_obj.previous_page_number %}">previous</a>

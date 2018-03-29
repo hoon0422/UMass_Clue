@@ -1,0 +1,46 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="{% static 'semantic/semantic.css' %}">
+    <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+    <script src="{% static 'semantic/semantic.js' %}"></script>
+    {% block css %}
+    {% endblock %}
+    <title>UMass Clue</title>
+</head>
+<body>
+<div class="ui inverted menu">
+    <div class="header item">
+        <h1>UMass Clue</h1>
+    </div>
+
+    <div class="item">
+        <form action="{% url "lectures:search_course" %}" accept-charset="utf-8" method="get">
+            <div class="ui transparent inverted icon input">
+                {{ search_form.search_key }}
+                <i class="search icon"></i>
+            </div>
+        </form>
+    </div>
+
+    <div class="right menu">
+        {% if user.is_authenticated %}
+            <div class="item">Hi, {{ user.get_username }}!</div>
+            <div class="item"><a href="{% url 'accounts:logout' %}?next={{ request.get_full_path }}">Logout</a></div>
+        {% else %}
+            <div class="item"><a href="{% url 'accounts:login' %}?next={{ request.get_full_path }}">Login</a></div>
+        {% endif %}
+    </div>
+</div>
+<div class="ui main container">
+    {% block content %}
+    {% endblock %}
+</div>
