@@ -1,43 +1,47 @@
 {% extends 'base/layout.html' %}
 {% block title %}Timetable Test{% endblock %}
 {% block content %}
-    {% for timetable in timetables %}
-        <p>Title: {{ timetable.title }}</p>
-        <table id="search_result" class="ui celled table">
-            <thead>
-            <tr>
-                <th>Major</th>
-                <th>Career</th>
-                <th>Title</th>
-                <th>Professor</th>
-                <th>Semester</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for section in timetable.sections.all %}
-                <tr onclick="window.location='{% url "lectures:detail" section.pk %}'">
-                    <td>{{ section.course.major.title }}</td>
-                    <td>{{ section.course.career.title }}</td>
-                    <td>{{ section.course.title }}</td>
-                    <td>
-                        {% for professor in section.professors.all %}
-                            {{ professor.name }}
-                            {% if not forloop.last %}
-                                ,
-                            {% endif %}
-                        {% endfor %}
-                    </td>
-                    <td>
-                        {{ section.course.year_and_semester.year }}&nbsp;
-                        {{ section.course.year_and_semester.semester }}
-                    </td>
+    {% if user.is_authenticated %}
+        {% for timetable in timetables %}
+            <p>Title: {{ timetable.title }}</p>
+            <table id="search_result" class="ui celled table">
+                <thead>
+                <tr>
+                    <th>Major</th>
+                    <th>Career</th>
+                    <th>Title</th>
+                    <th>Professor</th>
+                    <th>Semester</th>
                 </tr>
-            {% empty %}
-                <p>No sections.</p>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% empty %}
-        <p>No timetables.</p>
-    {% endfor %}
+                </thead>
+                <tbody>
+                {% for section in timetable.sections.all %}
+                    <tr onclick="window.location='{% url "lectures:detail" section.pk %}'">
+                        <td>{{ section.course.major.title }}</td>
+                        <td>{{ section.course.career.title }}</td>
+                        <td>{{ section.course.title }}</td>
+                        <td>
+                            {% for professor in section.professors.all %}
+                                {{ professor.name }}
+                                {% if not forloop.last %}
+                                    ,
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {{ section.course.year_and_semester.year }}&nbsp;
+                            {{ section.course.year_and_semester.semester }}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <p>No sections.</p>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% empty %}
+            <p>No timetables.</p>
+        {% endfor %}
+    {% else %}
+        <p>Please login.</p>
+    {% endif %}
 {% endblock %}
