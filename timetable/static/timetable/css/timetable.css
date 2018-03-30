@@ -1,0 +1,17 @@
+table {
+    width: 100%;
+    border: 1px solid #444444;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #444444;
+}
+
+tr.odd>td {
+    border-top-style: dashed;
+}
+
+tr.even>td {
+    border-bottom-style: dashed;
+}

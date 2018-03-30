@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Template</title>
+    <link rel="stylesheet" href="../../static/timetable/css/timetable.css">
+</head>
+<body>
+<table id="timetable">
+    <thead>
+    <tr>
+
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+<script type="text/javascript" src="../../static/timetable/js/timetable.js"></script>
+<script>
+    var days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+    var start = 6, end = 20;
+    var t = new Timetable("timetable", days, start, end);
+    var lectureString1 = "10:00~12:00 3 asdfasdfasfasdasfdadsf";
+    t.addLecture(lectureString1);
+
+    t.tableSettings.divHeight = 13;
+    t.updateTableSettings();
+
+</script>
+</body>
+</html>
