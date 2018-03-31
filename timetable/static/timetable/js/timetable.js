@@ -156,6 +156,12 @@ function Timetable(elementId, days, startHour, endHour) {
         }
     };
 
+    this.clearLectures = function () {
+        while (this.lectures.length !== 0) {
+            this.removeRectangle(this.lectures.pop().toString());
+        }
+    };
+
     this.updateTableSettings = function () {
         var i, j;
 

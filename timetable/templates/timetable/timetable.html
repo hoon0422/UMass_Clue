@@ -12,6 +12,7 @@
                     <th>Title</th>
                     <th>Professor</th>
                     <th>Semester</th>
+                    <th>Time</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -31,6 +32,11 @@
                         <td>
                             {{ section.course.year_and_semester.year }}&nbsp;
                             {{ section.course.year_and_semester.semester }}
+                        </td>
+                        <td class="section-times">
+                            {% for time in section.times.all %}
+                                {{ time.day }} {{ time.start_time|time:"H:i" }}~{{ time.end_time|time:"H:i" }}
+                            {% endfor %}
                         </td>
                     </tr>
                 {% empty %}
