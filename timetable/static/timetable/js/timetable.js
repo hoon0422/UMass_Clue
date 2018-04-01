@@ -1,3 +1,58 @@
+function LectureList(classListId) {
+    var tbody = document.getElementById(classListId).getElementsByTagName("tbody")[0];
+    this.lectures = [];
+
+    this.initialize = function () {
+        var i, j;
+        var timeFormat = "Dd HH:MM~HH:MM";
+        var rows = tbody.getElementsByTagName("tr");
+        for (i = 0; i < rows.length; i++) {
+            var title = rows[i].getElementsByClassName("section-title")[0].textContent;
+            var professors = rows[i].getElementsByClassName("section-professors")[0].textContent;
+            var message = title + "\n" + professors;
+            var times = rows[i].getElementsByClassName("section-times")[0].textContent;
+            var numOfTimes = times.length / timeFormat.length;
+            for (j = 0; j < numOfTimes; j++) {
+                var timeStr = times.substr(j * timeFormat.length, timeFormat.length);
+                var dayStr = times.substr(0, 2);
+                var day;
+                switch (dayStr) {
+                    case "Mo":
+                        day = 1;
+                        break;
+                    case "Tu":
+                        day = 2;
+                        break;
+                    case "We":
+                        day = 3;
+                        break;
+                    case "Th":
+                        day = 4;
+                        break;
+                    case "Fr":
+                        day = 5;
+                        break;
+                    case "Sa":
+                        day = 6;
+                        break;
+                    default:
+                        day = 7;
+                        break;
+                }
+                var stringInfo = timeStr.substr(4);
+                stringInfo += "_day" + day + " " + message;
+                this.lectures.push(makeLecture(stringInfo));
+            }
+        }
+    };
+    this.initialize();
+
+    this.update = function () {
+        this.lectures.clear();
+        this.initialize();
+    }
+}
+
 function timeToStr(hour, min) {
     return (hour < 10 ? "0" : "") + hour + ":" + (min < 10 ? "0" : "") + min;
 }
@@ -276,3 +331,19 @@ function Timetable(elementId, days, startHour, endHour) {
     }
 }
 
+function LecturePage(classListId, timetableId, days, startHour, endHour) {
+    this.lectureList = new LectureList(classListId);
+    this.timetable = new Timetable(timetableId, days, startHour, endHour);
+
+    this.initialize = function () {
+        for (var i = 0; i < this.lectureList.lectures.length; i++) {
+            this.timetable.addLecture(this.lectureList[i].toString());
+        }
+    };
+
+    this.update = function () {
+        this.lectureList.update();
+        this.timetable.clearLectures();
+        this.initialize();
+    }
+}

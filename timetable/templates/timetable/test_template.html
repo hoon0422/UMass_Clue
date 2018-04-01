@@ -6,7 +6,7 @@
 {% block content %}
     {% with timtables.all|first as timetable %}
         <p>Title: {{ timetable.title }}</p>
-        <table id="search_result" class="ui celled table">
+        <table id="search_result" class="ui celled table" onchange="table.update()">
             <thead>
             <tr>
                 <th>Major</th>
@@ -58,15 +58,7 @@
         </table>
         <script type="text/javascript" src="../../static/timetable/js/timetable.js"></script>
         <script>
-            var days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-            var start = 6, end = 20;
-            var t = new Timetable("timetable", days, start, end);
-            {#var lectureString1 = "10:00~12:00 3 asdfasdfasfasdasfdadsf";#}
-            {#t.addLecture(lectureString1);#}
-            {##}
-            {#t.tableSettings.divHeight = 13;#}
-            {#t.updateTableSettings();#}
-
+            var table = new LecturePage("search_result", "timetable");
         </script>
     {% endwith %}
 {% endblock %}
