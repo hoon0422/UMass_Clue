@@ -15,3 +15,21 @@ tr.odd>td {
 tr.even>td {
     border-bottom-style: dashed;
 }
+
+.lecture_rectangle {
+    width: auto;
+    position: relative;
+    z-index: 0;
+    text-align: left;
+    display: table;
+}
+
+.lecture_rectangle-info {
+    padding: 10px;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.day0 {
+    text-align: center;
+}

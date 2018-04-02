@@ -5,7 +5,7 @@ from lectures.forms import SearchForm
 
 
 class TimetableView(LoginRequiredMixin, generic.TemplateView):
-    template_name = 'timetable/timetable.html'
+    template_name = 'timetable/test_template.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
