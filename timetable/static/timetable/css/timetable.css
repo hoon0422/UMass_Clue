@@ -1,35 +1,37 @@
-table {
+#timetable {
     width: 100%;
     border: 1px solid #444444;
     border-collapse: collapse;
 }
 
-th, td {
+#timetable th, #timetable td {
     border: 1px solid #444444;
 }
 
-tr.odd>td {
+#timetable tr.odd>td {
     border-top-style: dashed;
 }
 
-tr.even>td {
+#timetable tr.even>td {
     border-bottom-style: dashed;
 }
 
-.lecture_rectangle {
-    width: auto;
+#timetable .lecture_rectangle {
+    width: 100%;
     position: relative;
     z-index: 0;
     text-align: left;
     display: table;
+    word-break: break-all;
 }
 
-.lecture_rectangle-info {
+#timetable .lecture_rectangle-info {
     padding: 10px;
     display: table-cell;
     vertical-align: middle;
 }
 
-.day0 {
+#timetable .day0 {
+    vertical-align: top;
     text-align: center;
 }

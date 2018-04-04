@@ -179,14 +179,28 @@ function Timetable(elementId, days, startHour, endHour) {
         const divStartElement = getTimeDivElementWithStart(lecture.day, lecture.startHour, lecture.startMin);
         const divEndElement = getTimeDivElementWithEnd(lecture.day, lecture.endHour, lecture.endMin);
         const newRectangle = document.createElement("div");
-        const span = document.createElement('span');
+        const info = document.createElement('div');
+        const title = document.createElement('p');
+        const professors = document.createElement('p');
         newRectangle.setAttribute("id", "lecture_" + lecture.toString());
         newRectangle.classList.add("lecture_rectangle");
-        newRectangle.appendChild(span);
+        newRectangle.appendChild(info);
 
-        span.setAttribute("id", "info_" + lecture.toString());
-        span.classList.add("lecture_rectangle-info");
-        span.textContent = lecture.message;
+        let titleMessage, professorsMessage;
+        let temp = lecture.message.split('\n');
+        titleMessage = temp[0];
+        professorsMessage = temp[1];
+
+        info.setAttribute("id", "info_" + lecture.toString());
+        info.classList.add("lecture_rectangle-info");
+        title.setAttribute("id", "title_" + lecture.toString());
+        title.classList.add("lecture_rectangle-info-title");
+        professors.setAttribute("id", "professors_" + lecture.toString());
+        professors.classList.add("lecture_rectangle-info-professors");
+        title.textContent = titleMessage;
+        professors.textContent = professorsMessage;
+        info.appendChild(title);
+        info.appendChild(professors);
 
         // height
         const top = divStartElement.getBoundingClientRect().top;
@@ -238,6 +252,10 @@ function Timetable(elementId, days, startHour, endHour) {
                 const dayClassElements = table.querySelectorAll(".day" + i);
                 for (j = 0; j < dayClassElements.length; j++)
                     dayClassElements[j].style.width = dayWidth + "%";
+            }
+            const timeClassElements = table.querySelectorAll(".day0");
+            for (i = 0; i < timeClassElements.length; i++) {
+                timeClassElements[i].style.width = this.tableSettings.timeWidth + "%";
             }
         }
 
