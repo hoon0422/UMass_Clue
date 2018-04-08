@@ -4,4 +4,5 @@ from . import views
 app_name = 'timetable'
 urlpatterns = [
     path('test/', views.TimetableView.as_view(), name='timetable_test'),
+    path('test/<int:id>', views.TimetableView.as_view(), name='timetable_test'),
 ]

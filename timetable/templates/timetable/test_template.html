@@ -4,62 +4,65 @@
     <link rel="stylesheet" href="../../static/timetable/css/timetable.css">
 {% endblock %}
 {% block content %}
-    {% with timetables.all|first as timetable %}
-        <p>Title: {{ timetable.title }}</p>
-        <table id="search_result" class="ui celled table" onchange="table.update()">
-            <thead>
-            <tr>
-                <th>Major</th>
-                <th>Career</th>
-                <th>Title</th>
-                <th>Professor</th>
-                <th>Semester</th>
-                <th>Time</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for section in timetable.sections.all %}
-                <tr onclick="window.location='{% url "lectures:detail" section.pk %}'">
-                    <td class="section-major">{{ section.course.major.title }}</td>
-                    <td class="section-career">{{ section.course.career.title }}</td>
-                    <td class="section-title">{{ section.course.title }}</td>
-                    <td class="section-professors">
-                        {% for professor in section.professors.all %}
-                            {{ professor.name }}
-                            {% if not forloop.last %}
-                                ,
-                            {% endif %}
-                        {% endfor %}
-                    </td>
-                    <td class="section-semester">
-                        {{ section.course.year_and_semester.year }}&nbsp;
-                        {{ section.course.year_and_semester.semester }}
-                    </td>
-                    <td class="section-times">
-                        {% for time in section.times.all %}
-                            {{ time.day }} {{ time.start_time|time:"H:i" }}~{{ time.end_time|time:"H:i" }}<br/>
-                        {% endfor %}
-                    </td>
+    {% with current_timetable as timetable %}
+        {% if timetable is None %}
+            <p>There is no timetable to display.</p>
+        {% else %}
+            <p>Title: {{ timetable.title }}</p>
+            <table id="search_result" class="ui celled table" onchange="table.update()">
+                <thead>
+                <tr>
+                    <th>Major</th>
+                    <th>Career</th>
+                    <th>Title</th>
+                    <th>Professor</th>
+                    <th>Semester</th>
+                    <th>Time</th>
                 </tr>
-            {% empty %}
-                <p>No sections.</p>
-            {% endfor %}
-            </tbody>
-        </table>
-        <table id="timetable">
-            <thead>
-            <tr>
+                </thead>
+                <tbody>
+                {% for section in timetable.sections.all %}
+                    <tr onclick="window.location='{% url "lectures:detail" section.pk %}'">
+                        <td class="section-major">{{ section.course.major.title }}</td>
+                        <td class="section-career">{{ section.course.career.title }}</td>
+                        <td class="section-title">{{ section.course.title }}</td>
+                        <td class="section-professors">
+                            {% for professor in section.professors.all %}
+                                {{ professor.name }}
+                                {% if not forloop.last %}
+                                    ,
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td class="section-semester">
+                            {{ section.course.year_and_semester.year }}&nbsp;
+                            {{ section.course.year_and_semester.semester }}
+                        </td>
+                        <td class="section-times">
+                            {% for time in section.times.all %}
+                                {{ time.day }} {{ time.start_time|time:"H:i" }}~{{ time.end_time|time:"H:i" }}<br/>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <p>No sections.</p>
+                {% endfor %}
+                </tbody>
+            </table>
+            <table id="timetable">
+                <thead>
+                <tr>
 
-            </tr>
-            </thead>
-            <tbody>
+                </tr>
+                </thead>
+                <tbody>
 
-            </tbody>
-        </table>
-        <script type="text/javascript" src="../../static/timetable/js/timetable.js"></script>
-        <script>
-            let table = new LecturePage("search_result", "timetable");
-        </script>
-
+                </tbody>
+            </table>
+            <script type="text/javascript" src="../../static/timetable/js/timetable.js"></script>
+            <script>
+                let table = new LecturePage("search_result", "timetable");
+            </script>
+        {% endif %}
     {% endwith %}
 {% endblock %}
