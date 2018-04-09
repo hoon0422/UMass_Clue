@@ -10,7 +10,7 @@ class Timetable(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False, default=None)
     sections = models.ManyToManyField(Section)
     _default = models.BooleanField(null=False, default=False)
-    modified_date = models.DateTimeField(auto_now=True, auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
