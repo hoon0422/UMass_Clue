@@ -19,7 +19,7 @@ class TimetableView(LoginRequiredMixin, generic.TemplateView):
             return None
 
         try:
-            id_for_display = self.request.GET['id']
+            id_for_display = self.kwargs['id']
             return models.Timetable.objects.get(id=id_for_display)
         except KeyError:
             for timetable in models.Timetable.objects.filter(user=self.request.user):
