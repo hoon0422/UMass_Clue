@@ -25,10 +25,9 @@ class Timetable(models.Model):
 
     def set_as_default(self):
         current_default = None
-        user_timetables = Timetable.objects.filter(user=self.user)
-        for i in range(len(user_timetables)):
-            if user_timetables[i].default and user_timetables[i] is not self:
-                current_default = user_timetables[i]
+        for user_timetable in Timetable.objects.filter(user=self.user):
+            if user_timetable.default and user_timetable is not self:
+                current_default = user_timetable
                 break
 
         if current_default is not None:
@@ -53,5 +52,4 @@ def set_recent_timetable_as_default_when_default_deleted(sender, instance, **kwa
         return
 
     recent = Timetable.objects.filter(user=instance.user).order_by('-modified_date')[0]
-    print(recent)
     recent.set_as_default()

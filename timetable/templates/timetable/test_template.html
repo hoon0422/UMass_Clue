@@ -6,9 +6,45 @@
 {% block content %}
     <ul>
         {% for timetable in timetables %}
-            <li><a href="{% url 'timetable:timetable_test' id=timetable.id %}">{{ timetable.title }}</a></li>
+            <li>
+                <a href="{% url 'timetable:timetable_test' id=timetable.id %}">{{ timetable.title }}</a>
+                <span id="btn_remove_timetable_{{ timetable.id }}" class="timetable-remove" onclick="removeTimetable(this.getAttribute('id'))">
+                    <i class="times link icon"></i>
+                </span>
+            </li>
         {% endfor %}
     </ul>
+    <button id="btn_new_timetable" onclick="$('#modal_add_timetable').modal('show')">Add New Timetable</button>
+    <div id="modal_add_timetable" class="ui tiny modal">
+        <div class="header">
+            Add New Timetable
+        </div>
+        <form method="post">
+            <div class="content">
+                {% csrf_token %}
+                <label>
+                    Please enter the title of a new timetable. <br/>
+                    <input id="input_timetable_title" type="text">
+                </label>
+            </div>
+            <div class="actions">
+                <div id="btn_new_timetable_ok" class="ui approve button">OK</div>
+                <div id="btn_new_timetable_cancel" class="ui cancel button">Cancel</div>
+            </div>
+        </form>
+    </div>
+    <div id="modal_remove_timetable" class="ui tiny modal">
+        <div class="header">Delete Timetable</div>
+        <form action="">
+            <div class="content">
+                <p>Are you sure you want to delete the timetable?</p>
+            </div>
+            <div class="actions">
+                <div class="ui approve button">Yes</div>
+                <div class="ui cancel button">No</div>
+            </div>
+        </form>
+    </div>
     {% if current_timetable is None %}
         <p>There is no timetable to display.</p>
     {% else %}
@@ -68,4 +104,45 @@
             let table = new LecturePage("search_result", "timetable");
         </script>
     {% endif %}
+
+    <script type="text/javascript">
+        $('#modal_add_timetable').modal({
+            onApprove: function () {
+                $.ajax({
+                    url: "{{ request.scheme }}://{{ request.get_host }}" +
+                        "{% url 'timetable:timetable_ajax_add' current_timetable_id=current_timetable.id %}",
+                    type: "POST",
+                    data: {
+                        title: document.getElementById("input_timetable_title").value,
+                        username: "{{ user.username }}",
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        window.location.replace(data.url);
+                    }
+                })
+            }
+        });
+
+        function removeTimetable(timetableId) {
+            let modalForRemove = $('#modal_remove_timetable');
+            modalForRemove.modal('show');
+            modalForRemove.modal({
+                onApprove: function () {
+                    $.ajax({
+                        url: "{{ request.scheme }}://{{ request.get_host }}" +
+                            "{% url 'timetable:timetable_ajax_remove' current_timetable_id=current_timetable.id %}",
+                        type: "POST",
+                        data: {
+                            id: timetableId.substr(timetableId.lastIndexOf('_') + 1)
+                        },
+                        dataType: 'json',
+                        success: function (data) {
+                            window.location.replace(data.url);
+                        }
+                    })
+                }
+            })
+        }
+    </script>
 {% endblock %}
