@@ -1,33 +1,96 @@
 {% extends "base/layout.html" %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/detail/detail.css' %}">
+{% endblock %}
 {% block content %}
-    <h1>Course: {{ section.course.title }}</h1>
-    <p>Class #: {{ section.class_num }}</p>
-    <p>
-        Professor:
-        {% for professor in section.professors.all %}
-            {{ professor.name }}
-            {% if not forloop.last %}
-                ,
-            {% endif %}
-        {% endfor %}
-    </p>
-    <p>Room: {{ section.room.name }}</p>
-    <p>Type: {{ section.course.category.title }}</p>
-    <p>
-        Components:
-        {% for component in section.components.all %}
-            {{ component.title }}
-            {% if not forloop.last %}
-                ,
-            {% endif %}
-        {% endfor %}
-    </p>
-    <p>
-        Unit:
-        {% if section.upper_unit == section.lower_unit %}
-            {{ section.upper_unit }}
-        {% else %}
-            {{ section.lower_unit }} ~ {{ section.upper_unit }}
-        {% endif %}
-    </p>
+    <div class="ui grid container" id="main">
+        <div class="ui twelve wide column">
+            <div class="ui right rail">
+                <div class="ui sticky">
+                    {% if user.is_authenticated %}
+                        <div id="timetable_segments" class="ui segments">
+                            <div class="ui segment">
+                                <div class="ui selection dropdown">
+                                    <input type="hidden" name="timetable">
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Timetable</div>
+                                    <div class="menu">
+                                        {% for timetable in timetables %}
+                                            <div id="timetable_{{ timetable.id }}"
+                                                 data-value="{{ timetable.id }}"
+                                                 data-text="{{ timetable.title }}"
+                                                 class="item timetable">{{ timetable.title }}</div>
+                                        {% empty %}
+                                            <div class="disabled item">You don't have any timetable.</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div hidden="hidden" id="timetable_segment" class="ui segment">
+                                <!-- Timetable with js -->
+                            </div>
+                        </div>
+                    {% else %}
+                        <p>Please log in to see your custom timetables.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="ui segment">
+                <h1>Course: {{ section.course.title }}</h1>
+                <p>Class #: {{ section.class_num }}</p>
+                <p>
+                    Professor:
+                    {% for professor in section.professors.all %}
+                        {{ professor.name }}
+                        {% if not forloop.last %}
+                            ,
+                        {% endif %}
+                    {% endfor %}
+                </p>
+                <p>Room: {{ section.room.name }}</p>
+                <p>Type: {{ section.course.category.title }}</p>
+                <p>
+                    Components:
+                    {% for component in section.components.all %}
+                        {{ component.title }}
+                        {% if not forloop.last %}
+                            ,
+                        {% endif %}
+                    {% endfor %}
+                </p>
+                <p>
+                    Unit:
+                    {% if section.upper_unit == section.lower_unit %}
+                        {{ section.upper_unit }}
+                    {% else %}
+                        {{ section.lower_unit }} ~ {{ section.upper_unit }}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="ui four wide column"></div>
+        </div>
+    </div>
+    <script>
+        $('.ui.sticky').sticky({context: '#main'});
+        $('.ui.dropdown').dropdown({
+            onChange: function (value, text, $selectedItem) {
+                $.ajax({
+                    url: "{{ request.scheme }}://{{ request.get_host }}" +
+                        "{% url 'lectures:timetable_info_ajax' pk=section.pk %}",
+                    type: "POST",
+                    data: {
+                        id: value
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        let sections = data.sections;
+                        $('#timetable_segment').removeAttr('hidden');
+                        console.log(sections);
+                        // TODO: make mini timetable
+                    }
+                })
+            }
+        });
+    </script>
 {% endblock %}

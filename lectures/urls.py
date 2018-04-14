@@ -6,5 +6,6 @@ app_name = 'lectures'
 urlpatterns = [
     path('', views.IndexView.as_view(), name='home'),
     path('search/', views.SearchView.as_view(), name='search_course'),
-    path('detail/<pk>/', views.DetailView.as_view(), name='detail')
+    path('detail/<pk>/', views.DetailView.as_view(), name='detail'),
+    path('detail/<pk>/timetable/ajax', views.timetable_info, name='timetable_info_ajax'),
 ]

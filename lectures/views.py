@@ -1,6 +1,8 @@
 from django.views import generic
 from .models import *
 from lectures.forms import *
+from timetable.models import Timetable
+from django.http import JsonResponse
 
 
 class IndexView(generic.TemplateView):
@@ -75,4 +77,33 @@ class DetailView(generic.DetailView):
         context = super().get_context_data(kwargs=kwargs)
         context["search_form"] = SearchForm(self.request.GET, self.request.FILES)
         context["search_key"] = ""
+        context["timetables"] = []
+        if self.request.user.is_authenticated:
+            print(Timetable.objects.filter(user=self.request.user))
+            context["timetables"] = Timetable.objects.filter(user=self.request.user)
         return context
+
+
+def timetable_info(request, pk):
+    if request.is_ajax():
+        timetable_id = request.POST["id"]
+        timetable = Timetable.objects.get(id=timetable_id)
+        sections = []
+        for section in timetable.sections.all():
+            section_data = {
+                "title": section.course.title,
+                "times": []
+            }
+            for time in section.times.all():
+                time_data = {
+                    "day": time.day,
+                    "start_hour": time.start_time.hour,
+                    "start_min": time.start_time.minute,
+                    "end_hour": time.end_time.hour,
+                    "end_min": time.end_time.minute
+                }
+                section_data["times"].append(time_data)
+            sections.append(section_data)
+
+        data = {"sections": sections}
+        return JsonResponse(data)
