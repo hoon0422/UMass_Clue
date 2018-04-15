@@ -37,7 +37,9 @@
                 </div>
             </div>
             <div class="ui segment">
-                <h1>Course: {{ section.course.title }}</h1>
+                <h1 id="course_title">Course: {{ section.course.title }}</h1>
+                <p>Semester: {{ section.course.year_and_semester.year }}&nbsp;
+                    {{ section.course.year_and_semester.semester }}</p>
                 <p>Class #: {{ section.class_num }}</p>
                 <p>
                     Professor:
@@ -71,6 +73,7 @@
             <div class="ui four wide column"></div>
         </div>
     </div>
+    <!-- TODO: add script and test -->
     <script>
         $('.ui.sticky').sticky({context: '#main'});
         $('.ui.dropdown').dropdown({
@@ -80,7 +83,8 @@
                         "{% url 'lectures:timetable_info_ajax' pk=section.pk %}",
                     type: "POST",
                     data: {
-                        id: value
+                        timetable_id: value,
+                        section_id: {{ section.id }}
                     },
                     dataType: 'json',
                     success: function (data) {

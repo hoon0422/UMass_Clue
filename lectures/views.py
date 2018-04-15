@@ -86,7 +86,8 @@ class DetailView(generic.DetailView):
 
 def timetable_info(request, pk):
     if request.is_ajax():
-        timetable_id = request.POST["id"]
+        # timetable section
+        timetable_id = request.POST["timetable_id"]
         timetable = Timetable.objects.get(id=timetable_id)
         sections = []
         for section in timetable.sections.all():
@@ -105,5 +106,25 @@ def timetable_info(request, pk):
                 section_data["times"].append(time_data)
             sections.append(section_data)
 
-        data = {"sections": sections}
+        # current section
+        section_id = request.POST["section_id"]
+        section = Section.objects.get(id=section_id)
+        section_data = {
+            "title": section.course.title,
+            "times": []
+        }
+        for time in section.times.all():
+            time_data = {
+                "day": time.day,
+                "start_hour": time.start_time.hour,
+                "start_min": time.start_time.minute,
+                "end_hour": time.end_time.hour,
+                "end_min": time.end_time.minute
+            }
+            section_data["times"].append(time_data)
+
+        data = {
+            "sections": sections,
+            "tempSection": section
+        }
         return JsonResponse(data)
