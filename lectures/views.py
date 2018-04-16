@@ -89,7 +89,7 @@ def timetable_info(request, pk):
         # timetable section
         timetable_id = request.POST["timetable_id"]
         timetable = Timetable.objects.get(id=timetable_id)
-        sections = []
+        sections_data = []
         for section in timetable.sections.all():
             section_data = {
                 "title": section.course.title,
@@ -98,13 +98,13 @@ def timetable_info(request, pk):
             for time in section.times.all():
                 time_data = {
                     "day": time.day,
-                    "start_hour": time.start_time.hour,
-                    "start_min": time.start_time.minute,
-                    "end_hour": time.end_time.hour,
-                    "end_min": time.end_time.minute
+                    "startHour": time.start_time.hour,
+                    "startMin": time.start_time.minute,
+                    "endHour": time.end_time.hour,
+                    "endMin": time.end_time.minute
                 }
                 section_data["times"].append(time_data)
-            sections.append(section_data)
+            sections_data.append(section_data)
 
         # current section
         section_id = request.POST["section_id"]
@@ -116,15 +116,19 @@ def timetable_info(request, pk):
         for time in section.times.all():
             time_data = {
                 "day": time.day,
-                "start_hour": time.start_time.hour,
-                "start_min": time.start_time.minute,
-                "end_hour": time.end_time.hour,
-                "end_min": time.end_time.minute
+                "startHour": time.start_time.hour,
+                "startMin": time.start_time.minute,
+                "endHour": time.end_time.hour,
+                "endMin": time.end_time.minute
             }
             section_data["times"].append(time_data)
 
         data = {
-            "sections": sections,
-            "tempSection": section
+            "sections": sections_data,
+            "tempSection": section_data
         }
         return JsonResponse(data)
+
+
+def add_class(request, pk):
+    if request.is_ajax():

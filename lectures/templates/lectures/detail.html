@@ -70,17 +70,49 @@
                     {% endif %}
                 </p>
             </div>
+            <div id="btn_add_class" class="ui right floated button" onclick="$('.ui.modal').modal('show');">Add Class</div>
             <div class="ui four wide column"></div>
         </div>
     </div>
-    <!-- TODO: add script and test -->
+    <div class="ui mini modal">
+    <i class="close icon"></i>
+    <div class="header">
+        Add Class
+    </div>
+    <div class="content">
+
+        <div class="ui form">
+            <div class="grouped fields">
+                <label>What timetable do you want to add the class to?</label>
+                {% for timetable in timetables %}
+                <div class="field">
+                    <div class="ui radio checkbox">
+                        <label>
+                            <input type="radio" name="{{ timetable.title }}">
+                            {{ timetable.title }}
+                        </label>
+                    </div>
+                </div>
+                {% empty %}
+                    <p>You do not have your timetable.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui approve button">Yes</div>
+        <div class="ui cancel button">No</div>
+    </div>
+    </div>
+    <script type="text/javascript" src="{% static 'js/detail/mini_timetable.js' %}"></script>
     <script>
+        let miniTimeTable = new MiniTimetable(6, 20, 15);
         $('.ui.sticky').sticky({context: '#main'});
         $('.ui.dropdown').dropdown({
             onChange: function (value, text, $selectedItem) {
                 $.ajax({
                     url: "{{ request.scheme }}://{{ request.get_host }}" +
-                        "{% url 'lectures:timetable_info_ajax' pk=section.pk %}",
+                    "{% url 'lectures:timetable_info_ajax' pk=section.pk %}",
                     type: "POST",
                     data: {
                         timetable_id: value,
@@ -88,10 +120,11 @@
                     },
                     dataType: 'json',
                     success: function (data) {
-                        let sections = data.sections;
                         $('#timetable_segment').removeAttr('hidden');
-                        console.log(sections);
-                        // TODO: make mini timetable
+                        miniTimeTable.deleteTimetable();
+                        miniTimeTable.newTimetable();
+                        miniTimeTable.addSections(data.sections);
+                        miniTimeTable.addTemporarySection(data.tempSection);
                     }
                 })
             }

@@ -6,15 +6,18 @@ function MiniTimetable(startHour, endHour, pxPerHour) {
     this.newTimetable = function () {
         let segment = document.getElementById('timetable_segment');
         this.table = document.createElement('table');
+        this.table.style.borderCollapse = "collapse";
+        this.table.style.border = "1px solid black";
         let thead = document.createElement('thead');
         let trForHead = document.createElement('tr');
         thead.appendChild(trForHead);
-        table.appendChild(thead);
-        segment.appendChild(table);
+        this.table.appendChild(thead);
+        segment.appendChild(this.table);
 
         // table head
         for (let i = 0; i < 7; i++) {
             let th = document.createElement('th');
+            th.style.border = "1px solid black";
             switch (i) {
                 case 0:
                     th.textContent = 'Mo';
@@ -46,31 +49,38 @@ function MiniTimetable(startHour, endHour, pxPerHour) {
         let tr = document.createElement('tr');
         for (let i = 0; i < 7; i++) {
             let td = document.createElement('td');
+            td.style.border = "1px solid black";
+            let columnDiv = document.createElement('div');
+            columnDiv.style.width = '100%';
+            td.appendChild(columnDiv);
             switch (i) {
                 case 0:
-                    td.setAttribute('id', 'timetable_Mo');
+                    columnDiv.setAttribute('id', 'timetable_Mo');
                     break;
                 case 1:
-                    td.setAttribute('id', 'timetable_Tu');
+                    columnDiv.setAttribute('id', 'timetable_Tu');
                     break;
                 case 2:
-                    td.setAttribute('id', 'timetable_We');
+                    columnDiv.setAttribute('id', 'timetable_We');
                     break;
                 case 3:
-                    td.setAttribute('id', 'timetable_Th');
+                    columnDiv.setAttribute('id', 'timetable_Th');
                     break;
                 case 4:
-                    td.setAttribute('id', 'timetable_Fr');
+                    columnDiv.setAttribute('id', 'timetable_Fr');
                     break;
                 case 5:
-                    td.setAttribute('id', 'timetable_Sa');
+                    columnDiv.setAttribute('id', 'timetable_Sa');
                     break;
                 default:
-                    td.setAttribute('id', 'timetable_Su');
+                    columnDiv.setAttribute('id', 'timetable_Su');
             }
-            td.style.height = ((endHour - startHour) * pxPerHour) + 'px';
-            td.classList.add('timetable-column');
+            columnDiv.style.height = ((endHour - startHour) * pxPerHour) + 'px';
+            columnDiv.classList.add('timetable-column');
             tr.appendChild(td);
+            let tbody = document.createElement('tbody');
+            tbody.appendChild(tr);
+            this.table.appendChild(tbody);
         }
     };
 
@@ -78,50 +88,55 @@ function MiniTimetable(startHour, endHour, pxPerHour) {
         for (let i = 0; i < sections.length; i++) {
             let sectionData = new SectionData(sections[i], startHour, pxPerHour);
             for (let j = 0; j < sections[i].times.length; j++) {
-                document.getElementById('timetable_' + sections[i].day).appendChild(sectionData.elements[j]);
+                document.getElementById('timetable_' + sections[i].times[j].day).appendChild(sectionData.elements[j]);
             }
             this.sections.push(sectionData);
         }
     };
 
     this.addTemporarySection = function (tempSection) {
-        let sectionData = new SectionData(tempSection, startHour, pxPerHour);
-        for (let j = 0; j < tempSection.times.length; j++) {
-            document.getElementById('timetable_' + tempSection.day).appendChild(sectionData.elements[j]);
+        let sectionData = new SectionData(tempSection, startHour, pxPerHour, '#11FF11', 0.7);
+        for (let i = 0; i < tempSection.times.length; i++) {
+            document.getElementById('timetable_' + tempSection.times[i].day).appendChild(sectionData.elements[i]);
         }
         this.tempSection = sectionData;
     };
 
     this.deleteTimetable = function () {
-        for (let i = 0; i < this.sections.length; i++) {
-            for (let j = 0; j < this.sections[i].elements.length; j++) {
-                this.sections[i].elements[j].remove();
+        if (this.table !== null) {
+            for (let i = 0; i < this.sections.length; i++) {
+                for (let j = 0; j < this.sections[i].elements.length; j++) {
+                    this.sections[i].elements[j].remove();
+                }
             }
-        }
-        this.sections = [];
+            this.sections = [];
 
-        for (let i = 0; i < this.tempSection.elements.length; i++) {
-            this.tempSection.elements[i].remove();
-        }
-        this.tempSection = null;
+            for (let i = 0; i < this.tempSection.elements.length; i++) {
+                this.tempSection.elements[i].remove();
+            }
+            this.tempSection = null;
 
-        this.table.remove();
-        this.table = null;
+            this.table.remove();
+            this.table = null;
+        }
     };
 }
 
-function SectionData(section, startHour, pxPerHour) {
+function SectionData(section, startHour, pxPerHour, color, opacitiy) {
     this.section = section;
     this.elements = [];
 
-    for (let i = 0; i < section.times[i]; i++) {
+    for (let i = 0; i < section.times.length; i++) {
         let element = document.createElement('div');
+        element.style.position = 'relative';
         element.style.width = '100%';
         element.style.height = (((section.times[i].endHour - section.times[i].startHour)
             + (section.times[i].endMin - section.times[i].startMin) / 60.0) * pxPerHour) + 'px';
         element.style.top = (((section.times[i].startHour - startHour)
             + section.times[i].startMin / 60.0) * pxPerHour) + 'px';
-        element.style.backgroundColor = '#1234FF';
+        element.style.backgroundColor = color ? color : '#1234FF';
+        if (opacitiy)
+            element.style.opacity = opacitiy
         this.elements.push(element);
     }
 }
