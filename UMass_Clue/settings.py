@@ -81,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'django_UMass_Clue',
         'USER': 'root',
-        'PASSWORD': '0000',
+        'PASSWORD': 'dudgns22',
         'HOST': 'localhost',
         'PORT': '3306'
     }

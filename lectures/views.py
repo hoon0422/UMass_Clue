@@ -3,6 +3,8 @@ from .models import *
 from lectures.forms import *
 from timetable.models import Timetable
 from django.http import JsonResponse
+from django.urls import reverse
+from django.shortcuts import get_object_or_404
 
 
 class IndexView(generic.TemplateView):
@@ -72,6 +74,7 @@ class SearchView(generic.ListView):
 class DetailView(generic.DetailView):
     template_name = "lectures/detail.html"
     model = Section
+    pk_url_kwarg = 'id'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(kwargs=kwargs)
@@ -84,7 +87,7 @@ class DetailView(generic.DetailView):
         return context
 
 
-def timetable_info(request, pk):
+def timetable_info(request, id):
     if request.is_ajax():
         # timetable section
         timetable_id = request.POST["timetable_id"]
@@ -130,5 +133,17 @@ def timetable_info(request, pk):
         return JsonResponse(data)
 
 
-def add_class(request, pk):
+def add_class(request, id):
     if request.is_ajax():
+        data = {
+            "url": request.build_absolute_uri(reverse('lectures:detail', args=(id,)))
+        }
+        if request.POST["selected_timetable_id"] == 'null':
+            data["nothing"] = True
+        else:
+            section = Section.objects.get(id=id)
+            timetable = Timetable.objects.get(id=request.POST["selected_timetable_id"])
+            timetable.sections.add(section)
+            data["nothing"] = False
+
+        return JsonResponse(data)

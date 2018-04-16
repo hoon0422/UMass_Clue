@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup as BS
 import traceback
 import json
 import time
+import os, platform
 from multiprocessing import Process
 
 DEBUG = True
@@ -62,7 +63,12 @@ class ClassCrawler:
 
     def __init__(self, options=None):
         self.options = options
-        self.driver = webdriver.Chrome('./chromedriver.exe', chrome_options=options)
+        if platform.system() == 'Windows':
+            self.driver = webdriver.Chrome('./chromedriver.exe', chrome_options=options)
+        elif platform.system() == 'Linux':
+            self.driver = webdriver.Chrome('./chromedriver', chrome_options=options)
+        else:
+            raise ValueError("Unsupported Operating System.")
         self.login_state = False
         self.major_keymap = None
         self.current_page = ClassCrawler.__CurrentPage()
@@ -438,8 +444,8 @@ def crawl_data(
             to_major_idx = major_num
         print(from_major_idx, "~", to_major_idx, " start")
 
-        class_file_name = "../raw/" + '/'.join(class_file_name.split('\\'))
-        log_file_name = "../raw/" + '/'.join(log_file_name.split('\\'))
+        class_file_name = os.path.join('..', 'raw', class_file_name)
+        log_file_name = os.path.join('..', 'raw', log_file_name)
 
         info = Info()
         with open(class_file_name, mode='a', encoding='utf8')as class_file, open(log_file_name, mode='a') as log_file:

@@ -52,6 +52,7 @@ function MiniTimetable(startHour, endHour, pxPerHour) {
             td.style.border = "1px solid black";
             let columnDiv = document.createElement('div');
             columnDiv.style.width = '100%';
+            columnDiv.style.position = 'relative';
             td.appendChild(columnDiv);
             switch (i) {
                 case 0:
@@ -95,7 +96,7 @@ function MiniTimetable(startHour, endHour, pxPerHour) {
     };
 
     this.addTemporarySection = function (tempSection) {
-        let sectionData = new SectionData(tempSection, startHour, pxPerHour, '#11FF11', 0.7);
+        let sectionData = new SectionData(tempSection, startHour, pxPerHour, '#11FF11', 0.4);
         for (let i = 0; i < tempSection.times.length; i++) {
             document.getElementById('timetable_' + tempSection.times[i].day).appendChild(sectionData.elements[i]);
         }
@@ -122,21 +123,23 @@ function MiniTimetable(startHour, endHour, pxPerHour) {
     };
 }
 
-function SectionData(section, startHour, pxPerHour, color, opacitiy) {
+function SectionData(section, startHour, pxPerHour, color, opacity) {
     this.section = section;
     this.elements = [];
 
     for (let i = 0; i < section.times.length; i++) {
         let element = document.createElement('div');
-        element.style.position = 'relative';
+        element.style.position = 'absolute';
         element.style.width = '100%';
         element.style.height = (((section.times[i].endHour - section.times[i].startHour)
             + (section.times[i].endMin - section.times[i].startMin) / 60.0) * pxPerHour) + 'px';
         element.style.top = (((section.times[i].startHour - startHour)
             + section.times[i].startMin / 60.0) * pxPerHour) + 'px';
         element.style.backgroundColor = color ? color : '#1234FF';
-        if (opacitiy)
-            element.style.opacity = opacitiy
+        if (opacity) {
+            element.style.filter = "alpha(opacity=" + opacity + ")";
+            element.style.opacity = opacity;
+        }
         this.elements.push(element);
     }
 }

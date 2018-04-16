@@ -52,6 +52,6 @@ def save_query(info: dict):
         section.components.add(component)
 
 
-infos = get_data("C:\\Users\\Administrator\\Desktop\\Younghoon_Jeong\\djangoPrac\\UMass_Clue\\UMass_Clue\\raw\\classes.txt")
+infos = get_data(os.path.join('..', 'raw', 'class.txt'))
 for info in infos:
     save_query(info)
