@@ -4,7 +4,7 @@ from lectures.forms import *
 from timetable.models import Timetable
 from django.http import JsonResponse
 from django.urls import reverse
-from django.shortcuts import get_object_or_404
+from django.db.models import Case, When, Value
 
 
 class IndexView(generic.TemplateView):
@@ -13,6 +13,7 @@ class IndexView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(kwargs=kwargs)
         context["search_form"] = SearchForm(self.request.GET, self.request.FILES)
+        context["detailed_search_form"] = DetailedSearchForm(self.request.GET, self.request.FILES)
         return context
 
 
@@ -23,7 +24,6 @@ class SearchView(generic.ListView):
 
     def get_queryset(self):
         option = self.get_search_option().lower()
-        print(option)
         if option == "course":
             courses = SearchView.search_course(self.get_search_key())
         elif option == "professor":
@@ -33,7 +33,7 @@ class SearchView(generic.ListView):
         else:
             courses = []
 
-        return courses
+        return courses.order_by("-course__year_and_semester", "course__category")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(kwargs=kwargs)
@@ -51,24 +51,26 @@ class SearchView(generic.ListView):
         return key[idx + 1:].strip()
 
     def get_search_key(self):
-        key = self.request.GET["search_key"]
-        idx = key.rfind('#')
-        if idx >= 0:
-            key = key[:idx]
-
-        return key
+        return self.request.GET["search_key"]
 
     @staticmethod
     def search_course(course_key):
-        return Section.objects.filter(course__title__contains=course_key)
+        sections = Section.objects.filter(course__title__icontains=course_key)
+        sorted(sections, key=lambda section: section.course.title.find(course_key))
+        # TODO: Bug - sorting with relevance works, but sorting with alphabetic order after relevance required
+        return sections
 
     @staticmethod
     def search_professor(professor_key):
-        return Section.objects.filter(professors__name__contains=professor_key)
+        sections = Section.objects.filter(professors__name__icontains=professor_key)
+        sorted(sections, key=lambda section: section.course.title.find(professor_key))
+        return sections
 
     @staticmethod
     def search_room(room_key):
-        return Section.objects.filter(room__name__contains=room_key)
+        sections = Section.objects.filter(room__name__icontains=room_key)
+        sorted(sections, key=lambda section: section.course.title.find(room_key))
+        return sections
 
 
 class DetailView(generic.DetailView):
@@ -82,7 +84,6 @@ class DetailView(generic.DetailView):
         context["search_key"] = ""
         context["timetables"] = []
         if self.request.user.is_authenticated:
-            print(Timetable.objects.filter(user=self.request.user))
             context["timetables"] = Timetable.objects.filter(user=self.request.user)
         return context
 

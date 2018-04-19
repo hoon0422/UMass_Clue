@@ -1,3 +1,39 @@
 {% extends "base/layout.html" %}
 {% block content %}
+    <form action="{% url 'lectures:search_course' %}">
+        <div id="input_container">
+
+        </div>
+        <div id="option_container">
+            {{ detailed_search_form.search_option }}
+        </div>
+    </form>
 {% endblock %}
+<script type="text/javascript">
+    let input_container = document.getElementById('input_container');
+    let input_method;
+    let search_option = document.getElementById('search_option');
+    search_option.onchange = function () {
+        let selectedOption = search_option.options[search_option.selectedIndex].value;
+        switch (selectedOption) {
+            case 'course_title': input_method = {{ detailed_search_form.course_title }}; break;
+            case 'course_number': input_method = {{ detailed_search_form.course_number }}; break;
+            case 'class_number': input_method = {{ detailed_search_form.class_number }}; break;
+            case 'professor': input_method = {{ detailed_search_form.professor }}; break;
+            case 'year_and_semester': input_method = {{ detailed_search_form.year_and_semester }}; break;
+            case 'time':
+                input_method = document.createElement('p');
+                input_method.appendChild({{ detailed_search_form.time.subwidgets.0 }});
+                input_method.appendChild(document.createTextNode(' '));
+                input_method.appendChild({{ detailed_search_form.time.subwidgets.1 }});
+                input_method.appendChild(document.createTextNode(':'));
+                input_method.appendChild({{ detailed_search_form.time.subwidgets.2 }});
+                input_method.appendChild(document.createTextNode(' ~ '));
+                input_method.appendChild({{ detailed_search_form.time.subwidgets.3 }});
+                input_method.appendChild(document.createTextNode(':'));
+                input_method.appendChild({{ detailed_search_form.time.subwidgets.4 }});
+                break;
+        }
+        if (input_method) input_container.appendChild(input_method)
+    }
+</script>
