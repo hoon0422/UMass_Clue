@@ -26,7 +26,6 @@ function csrfSafeMethod(method) {
 
 $.ajaxSetup({
     beforeSend: function (xhr, settings) {
-        console.log(csrfSafeMethod(settings.type));
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
             xhr.setRequestHeader("X-CSRFToken", csrftoken);
         }

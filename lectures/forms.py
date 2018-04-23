@@ -1,5 +1,4 @@
-from django import forms
-from .models import YearAndSemester, Course
+from .widgets import *
 
 
 class SearchForm(forms.Form):
@@ -12,82 +11,56 @@ class SearchForm(forms.Form):
         required=False)
 
 
-class SearchInput:
+class CourseNumberChoiceField(forms.ChoiceField):
+    widget = CourseNumberChoice
+
+
+class YearAndSemesterChoiceField(forms.ChoiceField):
+    widget = YearAndSemesterSelect
+
+
+class DayChoiceField(forms.ChoiceField):
+    widget = DaySelect
+
+
+class HourChoiceField(forms.ChoiceField):
+    widget = HourSelect
+
+
+class MinuteChoiceField(forms.ChoiceField):
+    widget = MinuteSelect
+
+
+class CourseTitleCharField(forms.CharField):
+    widget = CourseTitleInput
     pass
 
 
-class CourseTitleInput(SearchInput, forms.TextInput):
+class ClassNumberCharField(forms.CharField):
+    widget = ClassNumberInput
     pass
 
 
-class CourseNumberInput(SearchInput, forms.Select):
-    choices = [
-        (cn, cn) for cn in Course.objects.values('course_num').distinct().order_by('course_num')
-    ]
-
-
-class ClassNumberInput(SearchInput, forms.TextInput):
+class ProfessorCharField(forms.CharField):
+    widget = ProfessorInput
     pass
 
 
-class ProfessorInput(SearchInput, forms.TextInput):
-    pass
+class TimeSearchField(forms.MultiValueField):
+    widget = TimeSearchWidget
 
+    def __init__(self, *args, **kwargs):
+        fields = [
+            DayChoiceField(),
+            HourChoiceField(),
+            MinuteChoiceField(),
+            HourChoiceField(),
+            MinuteChoiceField()
+        ]
+        super().__init__(fields, **kwargs)
 
-class YearAndSemesterSelect(forms.Select):
-    choices = [
-        (str(ys), str(ys)) for ys in YearAndSemester.objects.all()
-    ]
-
-
-class DaySelect(forms.Select):
-    choices = [
-        ('Mo', 'Mo'),
-        ('Tu', 'Tu'),
-        ('We', 'We'),
-        ('Th', 'Th'),
-        ('Fr', 'Fr'),
-        ('Sa', 'Sa'),
-        ('Su', 'Su')
-    ]
-
-
-class HourSelect(forms.Select):
-    @staticmethod
-    def _make_choices(start, end):
-        result = []
-        for i in range(start, end):
-            result.append((i, str(i)))
-        return result
-
-    choices = _make_choices(6, 20)
-
-
-class MinuteSelect(forms.Select):
-    choices = [
-        (0, '00'),
-        (10, '10'),
-        (20, '20'),
-        (30, '30'),
-        (40, '40'),
-        (50, '50'),
-    ]
-
-
-class TimeSearchWidget(forms.MultiWidget):
-    def __init__(self, attrs=None):
-        widgets = (
-            DaySelect(attrs={'id': 'select_day'}),
-            HourSelect(attrs={'id': 'select_start_hour'}),
-            MinuteSelect(attrs={'id': 'select_start_minute'}),
-            HourSelect(attrs={'id': 'select_end_hour'}),
-            MinuteSelect(attrs={'id': 'select_end_minute'})
-        )
-        super(TimeSearchWidget, self).__init__(widgets, attrs=attrs)
-
-    def decompress(self, value):
-        return [value.day, value.start_hour, value.start_minute, value.end_hour, value.end_min] if value \
-            else [None, None, None, None, None]
+    def compress(self, data_list):
+        return data_list
 
 
 class DetailedSearchForm(forms.Form):
@@ -99,10 +72,17 @@ class DetailedSearchForm(forms.Form):
         ('year_and_semester', 'Semester'),
         ('time', 'Time')
     ]
-    search_option = forms.Select(choices=CHOICES, attrs={'id': 'search_option'})
-    course_title = CourseTitleInput(attrs={'placeholder': 'Enter course title...'})
-    course_number = CourseNumberInput(attrs={'placeholder': 'Enter course number...'})
-    class_number = ClassNumberInput(attrs={'placeholder': 'Enter class number...'})
-    professor = ProfessorInput(attrs={'placeholder': "Enter professor's name..."})
-    year_and_semester = YearAndSemesterSelect(attrs={'placeholder': 'Year Semester'})
-    time = TimeSearchWidget()
+    search_option = forms.ChoiceField(choices=CHOICES, widget=forms.Select(attrs={
+        'id': 'search_option',
+        'onchange': 'searchOptionChange()'
+    }))
+    course_title = CourseTitleCharField()
+    course_number = CourseNumberChoiceField(choices=[
+        (str(cn), str(cn)) for cn in Course.objects.values('course_num').distinct().order_by('course_num')
+    ])
+    class_number = ClassNumberCharField()
+    professor = ProfessorCharField()
+    year_and_semester = YearAndSemesterChoiceField(choices=[
+        (str(ys), str(ys)) for ys in YearAndSemester.objects.all()
+    ])
+    time = TimeSearchField()

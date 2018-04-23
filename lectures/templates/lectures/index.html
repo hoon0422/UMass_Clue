@@ -1,39 +1,98 @@
 {% extends "base/layout.html" %}
 {% block content %}
-    <form action="{% url 'lectures:search_course' %}">
-        <div id="input_container">
+    <div class="ui container">
+        <form action="{% url 'lectures:search_course' %}" class="ui form">
+            {% csrf_token %}
+            <div class="ui segments">
+                <div class="ui segment grid">
+                    <div id="input_container" class="twelve wide column">
+                        <div id="input_course_title">
+                            {{ detailed_search_form.course_title }}
+                        </div>
+                        <div id="input_course_number" hidden>
+                            {{ detailed_search_form.course_number }}
+                        </div>
+                        <div id="input_class_number" hidden>
+                            {{ detailed_search_form.class_number }}
+                        </div>
+                        <div id="input_professor" hidden>
+                            {{ detailed_search_form.professor }}
+                        </div>
+                        <div id="input_year_and_semester" hidden>
+                            {{ detailed_search_form.year_and_semester }}
+                        </div>
+                        <div id="input_time" hidden>
+                            <div class="ui container grid">
+                                <div class="column" style="width: 17%">
+                                    {{ detailed_search_form.time.as_widget.0 }}
+                                </div>
+                                <div class="column" style="width: 17%">
+                                    {{ detailed_search_form.time.as_widget.1 }}
+                                </div>
+                                <div class="center middle aligned column" style="width: 2%">:</div>
+                                <div class="column" style="width: 17%">
+                                    {{ detailed_search_form.time.as_widget.2 }}
+                                </div>
+                                <div class="center middle aligned column" style="width: 2%">~</div>
+                                <div class="column" style="width: 17%">
+                                    {{ detailed_search_form.time.as_widget.3 }}
+                                </div>
+                                <div class="center middle aligned column" style="width: 2%">:</div>
+                                <div class="column" style="width: 17%">
+                                    {{ detailed_search_form.time.as_widget.4 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="option_container" class="four wide column">
+                        {{ detailed_search_form.search_option }}
+                    </div>
+                </div>
+                <button class="ui right floated button" style="margin-top: 10px;">Search</button>
+            </div>
+        </form>
+    </div>
 
-        </div>
-        <div id="option_container">
-            {{ detailed_search_form.search_option }}
-        </div>
-    </form>
 {% endblock %}
-<script type="text/javascript">
-    let input_container = document.getElementById('input_container');
-    let input_method;
-    let search_option = document.getElementById('search_option');
-    search_option.onchange = function () {
-        let selectedOption = search_option.options[search_option.selectedIndex].value;
-        switch (selectedOption) {
-            case 'course_title': input_method = {{ detailed_search_form.course_title }}; break;
-            case 'course_number': input_method = {{ detailed_search_form.course_number }}; break;
-            case 'class_number': input_method = {{ detailed_search_form.class_number }}; break;
-            case 'professor': input_method = {{ detailed_search_form.professor }}; break;
-            case 'year_and_semester': input_method = {{ detailed_search_form.year_and_semester }}; break;
-            case 'time':
-                input_method = document.createElement('p');
-                input_method.appendChild({{ detailed_search_form.time.subwidgets.0 }});
-                input_method.appendChild(document.createTextNode(' '));
-                input_method.appendChild({{ detailed_search_form.time.subwidgets.1 }});
-                input_method.appendChild(document.createTextNode(':'));
-                input_method.appendChild({{ detailed_search_form.time.subwidgets.2 }});
-                input_method.appendChild(document.createTextNode(' ~ '));
-                input_method.appendChild({{ detailed_search_form.time.subwidgets.3 }});
-                input_method.appendChild(document.createTextNode(':'));
-                input_method.appendChild({{ detailed_search_form.time.subwidgets.4 }});
-                break;
+{% block script %}
+    <script type="text/javascript">
+        function hideAllInput() {
+            let inputContainer = document.getElementById('input_container');
+            let divs = inputContainer.getElementsByTagName('div');
+            for (let i = 0; i < divs.length; i++)
+                divs[i].hidden = true;
         }
-        if (input_method) input_container.appendChild(input_method)
-    }
-</script>
+
+        function showInput(inputId) {
+            console.log(inputId);
+            document.getElementById(inputId).hidden = false;
+        }
+
+        function searchOptionChange() {
+            hideAllInput();
+
+            let searchOption = document.getElementById('search_option');
+            let selectedOption = searchOption.options[searchOption.selectedIndex].value;
+            switch (selectedOption) {
+                case 'course_title':
+                    showInput('input_course_title');
+                    break;
+                case "course_number":
+                    showInput('input_course_number');
+                    break;
+                case "class_number":
+                    showInput('input_class_number');
+                    break;
+                case "professor":
+                    showInput('input_professor');
+                    break;
+                case "year_and_semester":
+                    showInput('input_year_and_semester');
+                    break;
+                case "time":
+                    showInput('input_time');
+                    break;
+            }
+        }
+    </script>
+{% endblock %}

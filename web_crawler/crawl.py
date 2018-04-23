@@ -332,14 +332,15 @@ class Info:
     def __preprocess_course_num(course_ele):
         if course_ele is None:
             return ""
-        return course_ele.text[course_ele.text.find(' ') + 1: course_ele.text.find('-')].strip()
+        return course_ele.text[: course_ele.text.find('-', course_ele.text.find(' ') + 1)].strip()
 
     @staticmethod
     def __preprocess_course_title(course_ele):
         if course_ele is None:
             return ""
-        bar_index = course_ele.text.find('-')
-        return course_ele.text[course_ele.text.find(' ', bar_index + 2):].strip()
+        space = course_ele.text.find(' ')
+        bar_index = course_ele.text.find('-', space + 1)
+        return course_ele.text[bar_index + 1:].strip()
 
     @staticmethod
     def __preprocess_class_num(class_num_ele):
@@ -431,7 +432,7 @@ class Info:
 def crawl_data(
         class_file_name: str = 'classes.txt',
         log_file_name: str = 'log.txt',
-        from_major_idx: int = 56,
+        from_major_idx: int = 0,
         to_major_idx: int = 200,
         options=None
 ):
