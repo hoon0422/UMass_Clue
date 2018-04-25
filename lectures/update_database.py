@@ -33,8 +33,9 @@ def save_query(info: dict):
 
     room, _ = Room.objects.get_or_create(name=info["room"])
 
-    section, _ = Section.objects.get_or_create(class_num=info["class_num"], room=room, course=course,
-                                               upper_unit=info["upper_unit"], lower_unit=info["lower_unit"])
+    section, _ = Section.objects.get_or_create(class_num=info["class_num"], room=room,
+                                               course=course, upper_unit=info["upper_unit"],
+                                               lower_unit=info["lower_unit"])
 
     for info_professor in info["professors"]:
         professor, _ = Professor.objects.get_or_create(name=info_professor)

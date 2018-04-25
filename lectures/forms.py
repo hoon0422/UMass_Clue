@@ -64,25 +64,14 @@ class TimeSearchField(forms.MultiValueField):
 
 
 class DetailedSearchForm(forms.Form):
-    CHOICES = [
-        ('course_title', 'Course title'),
-        ('course_number', 'Course number'),
-        ('class_number', 'Class number'),
-        ('professor', 'Professor'),
-        ('year_and_semester', 'Semester'),
-        ('time', 'Time')
-    ]
-    search_option = forms.ChoiceField(choices=CHOICES, widget=forms.Select(attrs={
-        'id': 'search_option',
-        'onchange': 'searchOptionChange()'
-    }))
-    course_title = CourseTitleCharField()
-    course_number = CourseNumberChoiceField(choices=[
-        (str(cn), str(cn)) for cn in Course.objects.values('course_num').distinct().order_by('course_num')
+    course_title = CourseTitleCharField(label='Course Title')
+    course_number = CourseNumberChoiceField(label='Course Number', choices=[('null', 'Course Number')] + [
+        (str(cn['course_num']), str(cn['course_num'])) \
+        for cn in Course.objects.values('course_num').distinct().order_by('course_num')
     ])
-    class_number = ClassNumberCharField()
-    professor = ProfessorCharField()
-    year_and_semester = YearAndSemesterChoiceField(choices=[
+    class_number = ClassNumberCharField(label='Class Number')
+    professor = ProfessorCharField(label='Professor')
+    year_and_semester = YearAndSemesterChoiceField(label='Year & Semester', choices=[('null', 'Year & Semester')] + [
         (str(ys), str(ys)) for ys in YearAndSemester.objects.all()
     ])
-    time = TimeSearchField()
+    time = TimeSearchField(label='Time')

@@ -29,6 +29,7 @@ class YearAndSemesterSelect(forms.Select):
 class DaySelect(forms.Select):
     def __init__(self, attrs=None):
         choices = [
+            ('null', 'Day'),
             ('Mo', 'Mo'),
             ('Tu', 'Tu'),
             ('We', 'We'),

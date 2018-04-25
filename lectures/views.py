@@ -5,6 +5,7 @@ from timetable.models import Timetable
 from django.http import JsonResponse
 from django.urls import reverse
 from django.db.models import Case, When, Value
+import time
 
 
 class IndexView(generic.TemplateView):
@@ -23,54 +24,78 @@ class SearchView(generic.ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        option = self.get_search_option().lower()
-        if option == "course":
-            courses = SearchView.search_course(self.get_search_key())
-        elif option == "professor":
-            courses = SearchView.search_professor(self.get_search_key())
-        elif option == "room":
-            courses = SearchView.search_room(self.get_search_key())
-        else:
-            courses = []
+        sections = Section.objects.filter(course__title__icontains=self.request.GET["search_key"])
+        sorted(sections, key=lambda section: section.course.title.find(self.request.GET["search_key"]))
+        # TODO: Bug - sorting with relevance works, but sorting with alphabetic order after relevance required
 
-        return courses.order_by("-course__year_and_semester", "course__category")
+        return sections.order_by("-course__year_and_semester", "course__category")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(kwargs=kwargs)
         context["search_form"] = SearchForm(self.request.GET, self.request.FILES)
-        context["search_key"] = self.get_search_key()
+        context["search_key"] = self.request.GET["search_key"]
         return context
 
-    def get_search_option(self):
-        key = self.get_search_key()
-        idx = key.rfind('#')
 
-        if idx == -1:
-            return "Course"
+class DetailSearchView(SearchView):
+    def get_queryset(self):
+        if self.is_all_keys_empty():
+            return []
 
-        return key[idx + 1:].strip()
+        keymap = self.get_keymap()
+        options = {}
 
-    def get_search_key(self):
-        return self.request.GET["search_key"]
+        if keymap["course_title"] is not '':
+            options["course__title__icontains"] = keymap["course_title"]
 
-    @staticmethod
-    def search_course(course_key):
-        sections = Section.objects.filter(course__title__icontains=course_key)
-        sorted(sections, key=lambda section: section.course.title.find(course_key))
-        # TODO: Bug - sorting with relevance works, but sorting with alphabetic order after relevance required
-        return sections
+        if keymap['course_number'] is not '':
+            options["course__number__icontains"] = keymap["course_title"]
 
-    @staticmethod
-    def search_professor(professor_key):
-        sections = Section.objects.filter(professors__name__icontains=professor_key)
-        sorted(sections, key=lambda section: section.course.title.find(professor_key))
-        return sections
+        if keymap['class_number'] is not '':
+            options["class__number__icontains"] = keymap["class_number"]
 
-    @staticmethod
-    def search_room(room_key):
-        sections = Section.objects.filter(room__name__icontains=room_key)
-        sorted(sections, key=lambda section: section.course.title.find(room_key))
-        return sections
+        if keymap['professor'] is not '':
+            options["professors__name__icontains"] = keymap["class_number"]
+
+        if keymap['year_and_semester'] is not '':
+            options["course__year_and_semester__year"] = keymap["year_and_semester"]
+
+        if keymap['time'] is not '':
+            options["times__day__exact"] = keymap['time'][0]
+            options["times__start_time__lte"] = keymap['time']
+            time.time()
+
+    def get_context_data(self, **kwargs):
+        pass
+
+    def get_keymap(self):
+        keymap = {
+            'course_title': self.request.GET['course_title'],
+            'course_number': self.request.GET['course_number'],
+            'class_number': self.request.GET['class_number'],
+            'professor': self.request.GET['professor'],
+            'year_and_semester': self.request.GET['year_and_semester'],
+            'time': self.request.GET['time']
+        }
+
+        if keymap['course_number'] == 'null':
+            keymap['course_number'] = ''
+
+        if keymap['year_and_semester'] == 'null':
+            keymap['year_and_semester'] = ''
+
+        if keymap['time'][0] == 'null':
+            keymap['time'] = ''
+
+        return keymap
+
+    def is_all_keys_empty(self):
+        return self.request.GET['course_title'] == '' and \
+               self.request.GET['course_number'] == 'null' and \
+               self.request.GET['class_number'] == '' and \
+               self.request.GET['professor'] == '' and \
+               self.request.GET['year_and_semester'] == '' and \
+               self.request.GET['time'][0] == 'null'
 
 
 class DetailView(generic.DetailView):

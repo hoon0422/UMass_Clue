@@ -9,6 +9,7 @@ import json
 import time
 import os, platform
 from multiprocessing import Process
+import re
 
 DEBUG = True
 
@@ -332,15 +333,16 @@ class Info:
     def __preprocess_course_num(course_ele):
         if course_ele is None:
             return ""
-        return course_ele.text[: course_ele.text.find('-', course_ele.text.find(' ') + 1)].strip()
+        course_num = course_ele.text[: course_ele.text.find('-', course_ele.text.find(' ') + 1)].strip()
+        return re.sub(' +', ' ', course_num)
 
     @staticmethod
     def __preprocess_course_title(course_ele):
         if course_ele is None:
             return ""
-        space = course_ele.text.find(' ')
-        bar_index = course_ele.text.find('-', space + 1)
-        return course_ele.text[bar_index + 1:].strip()
+        bar_index = course_ele.text.find('-', course_ele.text.find(' ') + 1)
+        space = course_ele.text.find(' ', bar_index + 2);
+        return course_ele.text[space + 1:].strip()
 
     @staticmethod
     def __preprocess_class_num(class_num_ele):
