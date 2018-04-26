@@ -1,10 +1,15 @@
+""" Views for the app
+
+This module has views for "lectures" app.
+
+"""
+
 from django.views import generic
 from .models import *
 from lectures.forms import *
 from timetable.models import Timetable
 from django.http import JsonResponse
 from django.urls import reverse
-from django.db.models import Case, When, Value
 import time
 
 
@@ -13,14 +18,18 @@ class IndexView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(kwargs=kwargs)
+
+        # form for search
         context["search_form"] = SearchForm(self.request.GET, self.request.FILES)
+
+        # form for detailed search
         context["detailed_search_form"] = DetailedSearchForm(self.request.GET, self.request.FILES)
         return context
 
 
 class SearchView(generic.ListView):
     template_name = "lectures/search.html"
-    context_object_name = "sections"
+    context_object_name = "sections"  # search results
     paginate_by = 10
 
     def get_queryset(self):
@@ -32,7 +41,11 @@ class SearchView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(kwargs=kwargs)
+
+        # form for search
         context["search_form"] = SearchForm(self.request.GET, self.request.FILES)
+
+        # the search key that user wrote for the search.
         context["search_key"] = self.request.GET["search_key"]
         return context
 
@@ -63,12 +76,17 @@ class DetailSearchView(SearchView):
         if keymap['time'] is not '':
             options["times__day__exact"] = keymap['time'][0]
             options["times__start_time__lte"] = keymap['time']
-            time.time()
+            # TODO: make time string to time field and use it on search.
 
     def get_context_data(self, **kwargs):
+        # TODO: return search result.
         pass
 
     def get_keymap(self):
+        """
+        Return a map between search option and its value.
+        :return: a map between search option and its value.
+        """
         keymap = {
             'course_title': self.request.GET['course_title'],
             'course_number': self.request.GET['course_number'],
@@ -90,12 +108,16 @@ class DetailSearchView(SearchView):
         return keymap
 
     def is_all_keys_empty(self):
+        """
+        Check if all options are empty.
+        :return: true if all options are empty, otherwise false.
+        """
         return self.request.GET['course_title'] == '' and \
-               self.request.GET['course_number'] == 'null' and \
-               self.request.GET['class_number'] == '' and \
-               self.request.GET['professor'] == '' and \
-               self.request.GET['year_and_semester'] == '' and \
-               self.request.GET['time'][0] == 'null'
+            self.request.GET['course_number'] == 'null' and \
+            self.request.GET['class_number'] == '' and \
+            self.request.GET['professor'] == '' and \
+            self.request.GET['year_and_semester'] == '' and \
+            self.request.GET['time'][0] == 'null'
 
 
 class DetailView(generic.DetailView):
@@ -114,6 +136,12 @@ class DetailView(generic.DetailView):
 
 
 def timetable_info(request, id):
+    """
+    View for AJAX request for information of timetable of a user.
+    :param request: AJAX request from client.
+    :param id: the ID of a section.
+    :return: JsonResponse with timetable data.
+    """
     if request.is_ajax():
         # timetable section
         timetable_id = request.POST["timetable_id"]
@@ -160,6 +188,13 @@ def timetable_info(request, id):
 
 
 def add_class(request, id):
+    """
+    View for AJAX request to add a current section.
+    :param request: AJAX request from client
+    :param id: the ID of a section.
+    :return: JsonResponse with data. The data has a url for redirection and
+        the result of addition of the section in the timetable.
+    """
     if request.is_ajax():
         data = {
             "url": request.build_absolute_uri(reverse('lectures:detail', args=(id,)))

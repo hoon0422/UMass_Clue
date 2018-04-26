@@ -1,7 +1,16 @@
+""" Module for models about lectures """
+
 from django.db import models
 
 
 class Career(models.Model):
+    """ Represents a career.
+
+    Comparison criteria: dictionary order of title.
+
+    Attributes:
+        title: the title of a career.
+    """
     title = models.CharField(max_length=15, null=False)
 
     def __lt__(self, other):
@@ -26,6 +35,13 @@ class Career(models.Model):
 
 
 class Major(models.Model):
+    """ Represents a major.
+
+    Comparison criteria: dictionary order of title.
+
+    Attributes:
+        title: the name of the major.
+    """
     title = models.CharField(max_length=30, null=False)
 
     def __lt__(self, other):
@@ -50,6 +66,16 @@ class Major(models.Model):
 
 
 class Category(models.Model):
+    """ Represents a category of a section.
+
+    Comparison criteria:
+        if there is a key in category_map, then follow it. If not, the priority is the latest.
+
+    Attributes:
+        title: the title of category.
+        category_map: dictionary for comparison.
+
+    """
     title = models.CharField(max_length=20, null=False)
     category_map = {
         "Lecture": 0,
@@ -89,6 +115,15 @@ class Category(models.Model):
 
 
 class YearAndSemester(models.Model):
+    """ Represents year and semester of a section.
+
+    Comparison criteria: follow semester_map.
+
+    Attributes:
+        year: year data (4 digits)
+        semester: semester data (Spring, Summer, Fall, Winter)
+
+    """
     year = models.PositiveSmallIntegerField(null=False)
     semester = models.CharField(max_length=10, null=False)
     semester_map = {
@@ -125,6 +160,16 @@ class YearAndSemester(models.Model):
 
 
 class Course(models.Model):
+    """ Represents a course.
+
+    Attributes:
+        title: the course title.
+        course_num: the course number (<major key> <some alphanumeric characters>).
+        major: the major of a course.
+        career: the career of a course.
+        category: the category of a course.
+        year_and_semester: the year and semester of a course.
+    """
     title = models.CharField(max_length=50, null=False)
     course_num = models.CharField(max_length=10, null=False)
     major = models.ForeignKey(Major, null=False, on_delete=models.DO_NOTHING)
@@ -134,6 +179,14 @@ class Course(models.Model):
 
 
 class Professor(models.Model):
+    """ Represents a professor.
+
+    Comparison criteria: dictionary order of name.
+
+    Attributes:
+        name: the name of a professor.
+
+    """
     name = models.CharField(max_length=50, null=False, primary_key=True)
 
     def __lt__(self, other):
@@ -158,6 +211,14 @@ class Professor(models.Model):
 
 
 class Room(models.Model):
+    """ Represents a room data.
+
+    Comparison criteria: dictionary order of name.
+
+    Attributes:
+        name: the name of the room.
+
+    """
     name = models.CharField(max_length=50, null=False)
 
     def __lt__(self, other):
@@ -182,6 +243,20 @@ class Room(models.Model):
 
 
 class DayTimeField(models.Model):
+    """ Represents a time unit of a section.
+
+    Comparison criteria:
+        1. day (Mo < Tu < We < Th < Fr < Sa < Su)
+        2. start_time
+        3. end_time
+
+    Attributes:
+        day: the day of a time unit.
+        start_time: the start time of a time unit.
+        end_time: the end time of a time unit.
+        day_map: the map for day comparison.
+
+    """
     day = models.CharField(max_length=2, null=False)
     start_time = models.TimeField(null=False)
     end_time = models.TimeField(null=False)
@@ -221,6 +296,19 @@ class DayTimeField(models.Model):
 
 
 class Section(models.Model):
+    """ Represents a section.
+
+    Attributes:
+        class_num: the 5-digit number. Primary key of a section in SPIRE.
+        professors: the professors teaching in a section (many to many relationship with 'Professor').
+        room: the room of a section.
+        times: the time units of a section (many to many relationship with "DayTimeField").
+        course: the course of a section.
+        components: the components of a section (many to many relationship with "Category").
+        upper_unit: the upper unit of a section.
+        lower_unit: the lower unit of a section.
+
+    """
     class_num = models.CharField(max_length=5, null=False)
     professors = models.ManyToManyField(Professor)
     room = models.ForeignKey(Room, on_delete=models.DO_NOTHING, null=False)

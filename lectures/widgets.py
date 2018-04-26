@@ -1,32 +1,56 @@
+""" Widgets for search
+
+This module has widgets to search lectures.
+
+"""
+
 import django.forms as forms
 from .models import *
 from django.utils.html import mark_safe
 
 
 class CourseTitleInput(forms.TextInput):
+    """
+    Text input for the search with course title.
+    """
     def __init__(self):
         super().__init__(attrs={'placeholder': 'Enter course title...'})
 
 
 class ClassNumberInput(forms.TextInput):
+    """
+    Text input for the search with class number.
+    """
     def __init__(self):
         super().__init__(attrs={'placeholder': 'Enter class number...'})
 
 
 class ProfessorInput(forms.TextInput):
+    """
+    Text input for the search with professor.
+    """
     def __init__(self):
         super().__init__(attrs={'placeholder': "Enter professor's name..."})
 
 
 class CourseNumberChoice(forms.Select):
+    """
+    Select widget for the search with course number.
+    """
     pass
 
 
 class YearAndSemesterSelect(forms.Select):
+    """
+    Select widget for the search with year and semester.
+    """
     pass
 
 
 class DaySelect(forms.Select):
+    """
+    Select widget for the search with day.
+    """
     def __init__(self, attrs=None):
         choices = [
             ('null', 'Day'),
@@ -42,6 +66,12 @@ class DaySelect(forms.Select):
 
 
 def _make_hour_choices(start, end):
+    """
+    Return a list of choices for hour criteria.
+    :param start: the first hour of choices.
+    :param end: the last hour of choices.
+    :return: a list of choices from start to end at intervals of an hour.
+    """
     result = []
     for i in range(start, end):
         result.append((i, str(i)))
@@ -49,12 +79,18 @@ def _make_hour_choices(start, end):
 
 
 class HourSelect(forms.Select):
+    """
+    Select widget for the search with hour.
+    """
     def __init__(self, attrs=None):
         choices = _make_hour_choices(6, 20)
         super().__init__(attrs=attrs, choices=choices)
 
 
 class MinuteSelect(forms.Select):
+    """
+    Select widget for the search with minute.
+    """
     def __init__(self, attrs=None):
         choices = [
             (0, '00'),
@@ -68,6 +104,14 @@ class MinuteSelect(forms.Select):
 
 
 class TimeSearchWidget(forms.MultiWidget):
+    """
+    Widget for the search with time. It consists of multiple widgets.
+        - DaySelect: select day.
+        - HourSelect: select start hour.
+        - MinuteSelect: select start minute.
+        - HourSelect: select end hour.
+        - MinuteSelect: select end minute.
+    """
     def __init__(self, attrs=None):
         widgets = (
             DaySelect(attrs={'id': 'select_day'}),
@@ -99,4 +143,6 @@ class TimeSearchWidget(forms.MultiWidget):
             if id_:
                 final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
             output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
+
+        # return sub-widgets in this widget for the template.
         return [mark_safe(self.format_value(x)) for x in output]

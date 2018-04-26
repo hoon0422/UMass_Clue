@@ -1,7 +1,15 @@
+""" Module to update database with class.txt
+
+This module updates database for class sections with class.txt in 'raw' folder created by 'crawl.py'.
+
+"""
+
 import os
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "UMass_Clue.settings")
 
 import django
+
 django.setup()
 
 from lectures.models import *
@@ -10,6 +18,11 @@ import datetime
 
 
 def get_data(file_name: str):
+    """
+    Get the list of dictionaries from the data about class sections.
+    :param file_name: the name of data file.
+    :return: the list of dictionaries from the data about class sections.
+    """
     infos = []
     with open(file_name, 'r', encoding='utf-8-sig') as file:
         data_str_list = file.read().strip().split('\n')
@@ -19,6 +32,10 @@ def get_data(file_name: str):
 
 
 def save_query(info: dict):
+    """
+    Save information of a class section in database.
+    :param info: information of a class section
+    """
     year_and_semester, _ = YearAndSemester.objects.get_or_create(year=info["year"], semester=info["semester"])
 
     career, _ = Career.objects.get_or_create(title=info["career"])
@@ -53,6 +70,7 @@ def save_query(info: dict):
         section.components.add(component)
 
 
-infos = get_data(os.path.join('..', 'raw', 'class.txt'))
-for info in infos:
-    save_query(info)
+if __name__ == "__main__":
+    infos = get_data(os.path.join('..', 'raw', 'class.txt'))
+    for info in infos:
+        save_query(info)
