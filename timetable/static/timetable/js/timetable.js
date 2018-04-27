@@ -1,7 +1,19 @@
+/**
+ * List of "Lecture" objects.
+ * @param classListId ID of table DOM element containing info of lectures in a timetable.
+ * @property lectures list of "Lecture" objects.
+ * @constructor
+ */
 function LectureList(classListId) {
     const tbody = document.getElementById(classListId).getElementsByTagName("tbody")[0];
     this.lectures = [];
 
+    /**
+     * Convert a string about multiple time periods to list of strings of a time period.
+     * @param timeStr string about time.
+     * @param token token separating multiple time periods.
+     * @returns {string[]} list of strings of a time period.
+     */
     function timeStrToTimes(timeStr, token) {
         const times = timeStr.split(token);
         let i;
@@ -17,6 +29,9 @@ function LectureList(classListId) {
         return times;
     }
 
+    /**
+     * Initialization of the object. Update "lectures".
+     */
     this.initialize = function () {
         let i, j;
         const timeFormat = "Dd HH:MM~HH:MM";
@@ -61,16 +76,35 @@ function LectureList(classListId) {
     };
     this.initialize();
 
+    /**
+     * Update "lectures".
+     */
     this.update = function () {
         this.lectures.clear();
         this.initialize();
     }
 }
 
+/**
+ * Change hour and minute to a string with format HH:MM.
+ * @param hour hour to be changed to a string
+ * @param min minute to be changed to a string
+ * @returns {string} a string for time with format HH:MM.
+ */
 function timeToStr(hour, min) {
     return (hour < 10 ? "0" : "") + hour + ":" + (min < 10 ? "0" : "") + min;
 }
 
+/**
+ * Class containing data about a lecture.
+ * @param startHour hour when a lecture starts.
+ * @param startMin minute when a lecture starts.
+ * @param endHour hour when a lecture ends.
+ * @param endMin minute when a lecture ends.
+ * @param day day when a lecture is held.
+ * @param message description about a lecture.
+ * @constructor
+ */
 function Lecture(startHour, startMin, endHour, endMin, day, message) {
     this.startHour = startHour;
     this.startMin = startMin;
@@ -79,6 +113,11 @@ function Lecture(startHour, startMin, endHour, endMin, day, message) {
     this.day = day;
     this.message = message;
 
+    /**
+     * Check if two "Lecture" objects are same.
+     * @param other another "Lecture" object.
+     * @returns {boolean} true if same, otherwise false.
+     */
     this.isSame = function (other) {
         if (other instanceof Lecture) {
             return this.startHour === other.startHour &&
@@ -91,6 +130,11 @@ function Lecture(startHour, startMin, endHour, endMin, day, message) {
         }
     };
 
+    /**
+     * Check if two "Lecture" objects' times are overlapped.
+     * @param other another "Lecture" object.
+     * @returns {boolean} true if overlapped, otherwise false.
+     */
     this.isOverlapped = function (other) {
         if (other instanceof Lecture) {
             if (this.day !== other.day)
@@ -117,11 +161,20 @@ function Lecture(startHour, startMin, endHour, endMin, day, message) {
             message;
     };
 
+    /**
+     * Return how long a lecture is held in minute.
+     * @returns {number} how long a lecture is held in minute.
+     */
     this.getTotalMins = function () {
         return (endHour * 60 + endMin) - (startHour * 60 + startHour);
     };
 }
 
+/**
+ * Make new "Lecture" object with information by a string.
+ * @param stringFormatInfo information about a lecture.
+ * @returns {Lecture} "Lecture" object.
+ */
 function makeLecture(stringFormatInfo) {
     // format of info: "HH:MM~HH:MM_dayD (any message)"
     // 'D' means 'day' which is a number representing the index of the day.
@@ -134,6 +187,16 @@ function makeLecture(stringFormatInfo) {
     return new Lecture(startHour, startMin, endHour, endMin, day, message);
 }
 
+/**
+ * Class representing a timetable.
+ * @param elementId ID of DOM element for table.
+ * @param days list of strings each of which represents a day.
+ * @param startHour hour that timetable starts with.
+ * @param endHour hour that timetable ends with.
+ * @property tableSettings json data for table settings
+ * @property lectures list of lectures
+ * @constructor
+ */
 function Timetable(elementId, days, startHour, endHour) {
     const numOfDivs = 6;
 
@@ -161,6 +224,11 @@ function Timetable(elementId, days, startHour, endHour) {
     setHead(this.days);
     setTimeRows(this.days, this.startHour, this.endHour);
 
+    /**
+     * Add a lecture with string information about it.
+     * @param stringInfo information about a lecture.
+     * @returns {boolean} true if added successfully, otherwise false.
+     */
     this.addLecture = function (stringInfo) {
         let i;
         const lecture = makeLecture(stringInfo);
@@ -174,6 +242,10 @@ function Timetable(elementId, days, startHour, endHour) {
         return true;
     };
 
+    /**
+     * Add a rectangle to a timetable with string information about a lecture.
+     * @param stringInfo string information about a rectangle.
+     */
     this.addRectangle = function (stringInfo) {
         const lecture = makeLecture(stringInfo);
         const divStartElement = getTimeDivElementWithStart(lecture.day, lecture.startHour, lecture.startMin);
@@ -191,6 +263,7 @@ function Timetable(elementId, days, startHour, endHour) {
         titleMessage = temp[0];
         professorsMessage = temp[1];
 
+        // info about a lecture
         info.setAttribute("id", "info_" + lecture.toString());
         info.classList.add("lecture_rectangle-info");
         title.setAttribute("id", "title_" + lecture.toString());
@@ -216,6 +289,11 @@ function Timetable(elementId, days, startHour, endHour) {
 
     // TODO: adjust lecture rectangle when divHeight is changed.
 
+    /**
+     * Remove a lecture specified by string information.
+     * @param stringInfo string information about a lecture to be removed.
+     * @returns {boolean} true if removed successfully, otherwise false.
+     */
     this.removeLecture = function (stringInfo) {
         for (let i = 0; i < this.lectures.length; i++) {
             if (this.lectures[i].isSame(stringInfo)) {
@@ -227,6 +305,10 @@ function Timetable(elementId, days, startHour, endHour) {
         return false;
     };
 
+    /**
+     * Remove a rectangle specified by string information.
+     * @param stringInfo string information about a rectangle to be removed.
+     */
     this.removeRectangle = function (stringInfo) {
         const lecture = makeLecture(stringInfo);
         const rec = document.getElementById("lecture_" + lecture.toString());
@@ -235,12 +317,18 @@ function Timetable(elementId, days, startHour, endHour) {
         }
     };
 
+    /**
+     * Remove all lectures.
+     */
     this.clearLectures = function () {
         while (this.lectures.length !== 0) {
             this.removeRectangle(this.lectures.pop().toString());
         }
     };
 
+    /**
+     * Update the table if the settings are changed.
+     */
     this.updateTableSettings = function () {
         let i, j;
 
@@ -276,6 +364,10 @@ function Timetable(elementId, days, startHour, endHour) {
     };
     this.updateTableSettings();
 
+    /**
+     * Set table head with days.
+     * @param days days to be displayed on table head.
+     */
     function setHead(days) {
         let i;
         const timeAndDays = ["Time"].concat(days);
@@ -289,6 +381,12 @@ function Timetable(elementId, days, startHour, endHour) {
         }
     }
 
+    /**
+     * Set rows according to the number of time periods.
+     * @param days list of strings for days.
+     * @param startHour hour that timetable starts with.
+     * @param endHour hour that timetable ends with.
+     */
     function setTimeRows(days, startHour, endHour) {
         const numOfRows = (endHour - startHour) * 2;
         const timeAndDays = ["Time"].concat(days);
@@ -327,9 +425,6 @@ function Timetable(elementId, days, startHour, endHour) {
                     // set class of div
                     div.classList.add("timecell");
 
-                    // set text (for test)
-                    // div.textContent = "----";
-
                     cell.appendChild(div);
                 }
 
@@ -343,6 +438,13 @@ function Timetable(elementId, days, startHour, endHour) {
         }
     }
 
+    /**
+     * Get div DOM element for time rectangle representing a lecture using time when a lecture starts.
+     * @param day day of a lecture.
+     * @param startHour hour when a lecture starts.
+     * @param startMin minute when a lecture starts.
+     * @returns {HTMLElement | null} div DOM element for time rectangle representing a lecture.
+     */
     function getTimeDivElementWithStart(day, startHour, startMin) {
         const minUnit = 30 / numOfDivs;
 
@@ -352,6 +454,13 @@ function Timetable(elementId, days, startHour, endHour) {
         return document.getElementById(timeToStr(startHour, startMin) + "~" + timeToStr(endHour, endMin) + "_day" + day);
     }
 
+    /**
+     * Get div DOM element for time rectangle representing a lecture using time when a lecture ends.
+     * @param day day of a lecture.
+     * @param endHour hour when a lecture ends.
+     * @param endMin minute when a lecture ends.
+     * @returns {HTMLElement | null} div DOM element for time rectangle representing a lecture.
+     */
     function getTimeDivElementWithEnd(day, endHour, endMin) {
         const minUnit = 30 / numOfDivs;
 
@@ -362,20 +471,32 @@ function Timetable(elementId, days, startHour, endHour) {
     }
 }
 
-function LecturePage(classListId, timetableId, days, startHour, endHour) {
+/**
+ * This class gets data from "LectureList" object and render the information in the object
+ * by making a new timetable.
+ * @param classListId ID of DOM element of table showing data about class list.
+ * @param timetableId ID of DOM element of table displaying timetable.
+ * @param days list of strings meaning days to be displayed on the head of timetable.
+ * @param startHour hour that timetable starts with.
+ * @param endHour hour that timetable ends with.
+ * @constructor
+ */
+function TimetablePage(classListId, timetableId, days, startHour, endHour) {
     this.lectureList = new LectureList(classListId);
     this.timetable = new Timetable(timetableId, days, startHour, endHour);
 
-    this.initialize = function () {
-        for (let i = 0; i < this.lectureList.lectures.length; i++) {
-            this.timetable.addLecture(this.lectureList.lectures[i].toString());
-        }
-    };
-    this.initialize();
+    for (let i = 0; i < this.lectureList.lectures.length; i++) {
+        this.timetable.addLecture(this.lectureList.lectures[i].toString());
+    }
 
+    /**
+     * Update when there is any change.
+     */
     this.update = function () {
         this.lectureList.update();
         this.timetable.clearLectures();
-        this.initialize();
+        for (let i = 0; i < this.lectureList.lectures.length; i++) {
+            this.timetable.addLecture(this.lectureList.lectures[i].toString());
+        }
     }
 }

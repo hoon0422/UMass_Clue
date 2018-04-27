@@ -1,8 +1,21 @@
+/**
+ * Represents a mini timetable shown on the left of the detail page.
+ * @param startHour hour that a mini timetable starts with.
+ * @param endHour hour that a mini timetable ends with.
+ * @param pxPerHour the number of pixels that a hour corresponds to.
+ * @property table DOM element of timetable.
+ * @property sections a list of "SectionData" objects in timetable.
+ * @property tempSection a temporary section of the current detail page.
+ * @constructor
+ */
 function MiniTimetable(startHour, endHour, pxPerHour) {
     this.table = null;
     this.sections = [];
     this.tempSection = null;
 
+    /**
+     * Make new timetable in HTML file.
+     */
     this.newTimetable = function () {
         let segment = document.getElementById('timetable_segment');
         this.table = document.createElement('table');
@@ -85,6 +98,10 @@ function MiniTimetable(startHour, endHour, pxPerHour) {
         }
     };
 
+    /**
+     * Add sections to the timetable.
+     * @param sections a list of information of each section.
+     */
     this.addSections = function (sections) {
         for (let i = 0; i < sections.length; i++) {
             let sectionData = new SectionData(sections[i], startHour, pxPerHour);
@@ -95,6 +112,10 @@ function MiniTimetable(startHour, endHour, pxPerHour) {
         }
     };
 
+    /**
+     * Add a section of the current detail page to the timetable.
+     * @param tempSection a section of the current detail page to the timetable.
+     */
     this.addTemporarySection = function (tempSection) {
         let sectionData = new SectionData(tempSection, startHour, pxPerHour, '#11FF11', 0.4);
         for (let i = 0; i < tempSection.times.length; i++) {
@@ -103,6 +124,9 @@ function MiniTimetable(startHour, endHour, pxPerHour) {
         this.tempSection = sectionData;
     };
 
+    /**
+     * Delete timetable from HTML.
+     */
     this.deleteTimetable = function () {
         if (this.table !== null) {
             for (let i = 0; i < this.sections.length; i++) {
@@ -123,6 +147,16 @@ function MiniTimetable(startHour, endHour, pxPerHour) {
     };
 }
 
+/**
+ * Represents a section in HTML. It includes information of a section and
+ * DOM element for rectangle in timetable.
+ * @param section information of a section from server.
+ * @param startHour hour that timetable starts with.
+ * @param pxPerHour the number of pixels that a hour corresponds to.
+ * @param color the color of rectangles for a section in timetable.
+ * @param opacity the opacity of rectangles for a section in timetable.
+ * @constructor
+ */
 function SectionData(section, startHour, pxPerHour, color, opacity) {
     this.section = section;
     this.elements = [];
